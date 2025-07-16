@@ -1,0 +1,5 @@
+
+# Large files that should not be committed
+*.zip
+seominisuite.zip
+sites/all/seominutes_backup_*.zip
