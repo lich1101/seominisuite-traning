@@ -1,0 +1,7 @@
+name = Cassiopeia Cleanup
+description = Module để làm trắng cơ sở dữ liệu
+core = 7.x
+package = Cassiopeia
+version = 7.x-1.0
+dependencies[] = cassiopeia
+dependencies[] = cassiopeia_guest_post

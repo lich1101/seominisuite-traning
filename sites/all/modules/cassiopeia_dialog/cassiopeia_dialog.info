@@ -1,0 +1,10 @@
+name = Cassiopeia dialog
+description = Cassiopeia dialog
+core = 7.x
+package = Cassiopeia
+
+dependencies[] = cassiopeia
+
+; Information added by drupal.org packaging script on 2011-11-10
+version = "7.x-1.01"
+datestamp = "1328134560"

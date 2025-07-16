@@ -1,0 +1,517 @@
+.radius-5 {
+    border-radius: 5px;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.mr-5 {
+    margin-right: 5px !important;
+}
+
+.ml-10 {
+    margin-left: 10px !important;
+}
+
+.fl-wrap {
+    flex-wrap: wrap;
+}
+.color-grey{
+    color:grey;
+}
+.mt-24 {
+    margin-top: 24px !important;
+}
+.mg-0 {
+    margin:0px !important;
+}
+
+.mb-24 {
+    margin-bottom: 24px !important;
+}
+.mb-10 {
+    margin-bottom: 10px !important;
+}
+
+.pb-0 {
+    padding-bottom: 0px !important;
+}
+
+.c-blue {
+    color: #337ebd !important;
+}
+
+.c-red {
+    color: #e55555;
+}
+
+.fs-12 {
+    font-size: 12px !important;
+}
+.ml-12{
+    margin-left: 12px;
+}
+.padding-24{
+    padding:24px !important;
+}
+.btn {
+    position: relative;
+    display: inline-block;
+    border-radius: 3px;
+}
+.bg-green{
+    background:#1F9F4C;
+}
+.color-green{
+    color:#1F9F4C;
+}
+.border-none{
+    border:none;
+}
+.color-white:hover,
+.color-white{
+    color:white;
+}
+.bold{
+    font-weight: bold;
+}
+.bg-grey{
+    background: #E5E6E9;
+}
+.bg-white{
+    background:white !important;
+}
+.no-grippie+.grippie{
+    display: none !important;
+}
+.pd-24{
+    padding:24px;
+}
+.small-box>.inner>p:last-child {
+    margin-bottom: 10px;
+}
+
+.alert a.close {
+    text-decoration: none;
+}
+
+th.active>a>img {
+    display: inline;
+    float: right;
+}
+
+.chosen-container.form-control {
+    border: none;
+    width: 100% !important;
+    padding: 0px;
+    height: auto !important;
+}
+
+.image-widget-data .input-group {
+    float: left;
+}
+
+.image-widget-data>button {
+    margin-bottom: 15px;
+}
+
+div.admin .right {
+    margin-right: 0px;
+    width: 50%;
+    padding-left: 10px;
+}
+
+div.admin .left {
+    margin-left: 0px;
+    width: 50%;
+    padding-right: 10px;
+}
+
+div.admin-panel.panel {
+    padding: 0px;
+    margin-bottom: 20px;
+}
+
+div.admin-panel.panel .body.panel-body {
+    padding: 15px;
+}
+
+.admin-panel .item-list,
+.admin-panel .admin-list,
+.admin-list {
+    background: transparent;
+    padding: 0px;
+    border: 0px;
+}
+
+.admin-panel h3 span.icon,
+.admin-list li a span.icon {
+    position: absolute;
+    left: 10px;
+}
+
+.admin-list-compact li a span.icon {
+    top: 5px;
+}
+
+.admin-panel h3 {
+    position: relative;
+    padding: 0px 5px 0px 50px;
+    margin: 0px;
+    min-height: 30px;
+}
+
+.node-type-list li,
+.admin-list li {
+    position: relative;
+    padding: 10px 5px 9px 50px;
+    margin: 0px;
+    min-height: 30px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.node-type-list li:last-child,
+.admin-list li:last-child {
+    border-bottom: 1px solid transparent;
+}
+
+.admin-panel h3 {
+    background: #f4f4f4;
+    line-height: 30px;
+}
+
+.content-header>.primary-local-tasks {
+    float: right;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.content-header>.primary-local-tasks li {
+    display: inline-block;
+    list-style: none;
+}
+
+.content-header>.primary-local-tasks li a {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    /*border: 1px solid transparent;*/
+    color: #fff;
+    background-color: #00a65a;
+    border-color: #008d4c;
+}
+
+.content-header>.primary-local-tasks li a:hover {
+    color: #fff;
+    background-color: #008d4c;
+    border-color: #398439;
+}
+
+.version-status>.icon {
+    float: right;
+}
+
+.version-links {
+    float: right;
+}
+
+.version-links ul {
+    padding: 0px;
+    margin: 0px;
+}
+
+.version-links ul>li {
+    display: inline-block;
+    list-style: none;
+    padding: 0px 5px 0px 5px;
+}
+
+.chosen-container-multi .chosen-choices {
+    border: 1px solid #d2d6de;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-image: none;
+    border-radius: 0px;
+    padding: 3px;
+}
+
+.chosen-container .chosen-drop {
+    margin-top: 10px;
+}
+
+.chosen-container-multi .chosen-choices li.search-field {
+    padding: 3px 20px 3px 5px;
+}
+
+.chosen-container-active .chosen-choices {
+    border: 1px solid #3c8dbc;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+@media (max-width: 991px) {
+    .content-header>.primary-local-tasks {
+        position: relative;
+        margin-top: 5px;
+        top: 0;
+        right: 0;
+        float: none;
+    }
+}
+
+#views-display-menu-tabs {
+    float: none !important;
+}
+
+.ctools-twisty {
+    width: 4px;
+}
+
+.views-ui-display-tab-bucket .ctools-button-processed button {
+    height: 18px;
+    padding: 0px 10px 0px 10px;
+    border: none;
+    background: none;
+    margin: 0px;
+    line-height: 18px;
+}
+
+#views-display-menu-tabs .action-list button {
+    width: 100%;
+}
+
+.treeTable tr.collapsed>td:first-child,
+.treeTable tr.expanded td:first-child {
+    padding-left: 19px !important;
+}
+
+#edit-options-alter-text-wrapper {
+    height: auto !important;
+}
+
+#system-image-toolkit-settings #edit-image-jpeg-quality {
+    width: calc(100% - 30px);
+    display: inline-block;
+    margin-right: 5px;
+}
+
+div.image-widget-data {
+    display: flex;
+}
+
+body.adminimal-menu div#admin-menu {
+    z-index: 999999999;
+}
+
+#WitAIContainer>.form-group,
+#product-node-form #ProductPriceContainer>.form-group {
+    position: relative;
+}
+
+.WitAI-group>.form-group,
+#product-node-form .product-price-group>.form-group {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+#cassiopeia-config-witai-form .WitAI-group button.close,
+#product-node-form .product-price-group>.form-group button.close {
+    width: 30px;
+    overflow: hidden;
+    position: relative;
+    height: 30px;
+    top: 9px;
+    opacity: 1;
+}
+
+
+/*#cassiopeia-config-witai-form .form-group button.teaProductPriceItemRemove  ,*/
+
+#product-node-form .form-group button.teaTimeAddMore {
+    opacity: 1;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+#cassiopeia-config-witai-form .form-group button.teaProductPriceItemRemove:after,
+#product-node-form .form-group button.teaTimeAddMore:after {
+    content: "Thêm giá";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    color: black;
+}
+
+#cassiopeia-config-witai-form .WitAI-group .form-group button.close:after,
+#product-node-form .product-price-group>.form-group button.close:after {
+    content: "\f014";
+    font-family: 'FontAwesome';
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: white;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    color: red;
+    opacity: 1;
+}
+
+.page-user-change-packet .block-title {
+    margin: 20px 0px;
+    border: solid thin grey;
+    padding: 10px;
+    font-size: 18px;
+}
+
+#cassiopeia-admin-manager-booking-filter-form>div,
+#cassiopeia-admin-manager-user-filter-form>div {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 30px;
+}
+
+#cassiopeia-admin-manager-booking-filter-form>div>.form-group,
+#cassiopeia-admin-manager-user-filter-form>div>.form-group {
+    margin: 0;
+    margin-right: 15px;
+}
+
+#cassiopeia-admin-add-booking-form .form-item-price label>div {
+    display: flex;
+}
+
+#cassiopeia-admin-add-booking-form .form-item-price label>div div {
+    width: 140px;
+}
+
+#cassiopeia-admin-add-booking-form .buttons {
+    margin-top: 30px;
+}
+
+.page-booking-manager .add-more {
+    margin-bottom: 30px;
+}
+.color-red{
+    color:red;
+}
+.custom-filter>div{
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin:0px -8px;
+}
+.custom-filter>div>div{
+    margin:0px;
+    width: 15%;
+    padding:0px 8px;
+}
+.custom-filter .container-inline-date .form-type-date-popup,
+.custom-filter .container-inline-date .form-type-date-popup div,
+.custom-filter .container-inline-date .form-type-date-popup input{
+    width:100%;
+}
+#modalContent .modal-dialog{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#modalContent .modal-content #modal-content,
+#modalContent .modal-content{
+    width: max-content !important;
+}
+#modalContent .modal-content .modal-header{
+    background: #3c8dbc;
+    color: white;
+    font-weight: bold;
+}
+
+#modalContent .modal-content #modal-content form{
+    width: 500px;
+}
+#modalContent .modal-content .close:active,
+#modalContent .modal-content .close:focus,
+#modalContent .modal-content .close:hover,
+#modalContent .modal-content .close{
+    color:white;
+    opacity: 1;
+    outline:none;
+}
+
+.page-admin-manager-guest-post-website .progress-block{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3c3c3c75;
+    z-index: 999999;
+    opacity: 0;
+    visibility: hidden;
+}
+.page-admin-manager-guest-post-website .progress-block.active{
+    opacity: 1;
+    visibility: visible;
+}
+.page-admin-manager-guest-post-website .progress-block .block-container{
+    background: white;
+    width: 400px;
+    height: 200px;
+}
+.page-admin-manager-guest-post-website .progress-block .block-container .block-header{
+    padding: 20px;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 20px;
+}
+.page-admin-manager-guest-post-website .progress-block .block-container .block-body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.page-admin-manager-guest-post-website .progress-block .block-container progress{
+    height: 30px;
+    width: 80%;
+}
+.btn-purple:hover,
+.btn-purple:focus,
+.btn-purple:active,
+.btn-purple{
+  background-color: purple;
+  border-color: purple;
+  color: white;
+}

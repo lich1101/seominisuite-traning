@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Cassiopeia Cleanup module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function cassiopeia_cleanup_install() {
+  drupal_set_message(t('Module Cassiopeia Cleanup đã được cài đặt thành công.'));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function cassiopeia_cleanup_uninstall() {
+  // Xóa các biến nếu có
+  // variable_del('cassiopeia_cleanup_setting');
+}

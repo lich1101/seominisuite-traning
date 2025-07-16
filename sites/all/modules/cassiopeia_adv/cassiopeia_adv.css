@@ -1,0 +1,26 @@
+#divAdPop_overlay{ 
+  background: none repeat scroll 0 0 #000000;
+  height: 100%;
+  left: 0;
+  opacity: 0.9;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 99999;
+  }
+#iddivAdPop_inner {
+  left: -5000px;
+  position: fixed;
+  top: 0;
+  z-index: 9999999;
+  display: block;
+ }
+#link-clode-pop { 
+	position: absolute; 
+	top: -25px; 
+	right: -45px; 
+	cursor: pointer; 
+	font-size: 14px; 
+	color: #fff; 
+	text-decoration: underline;
+ }

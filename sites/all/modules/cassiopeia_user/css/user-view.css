@@ -1,0 +1,24 @@
+
+
+.user-view-page .user-group-field {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #c0c0c0;
+}
+
+.user-view-page .user-group-field:last-child {
+    border-bottom: transparent;
+}
+
+.user-view-page .user-field-item {
+    padding: 5px 0px 5px 0px;
+}
+.user-view-page .user-field-item span {
+    display: inline-block;
+}
+.user-view-page .user-field-item span.label {
+    min-width: 120px;
+    color: black;
+    text-align: left;
+    font-size: 90%;
+}

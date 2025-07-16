@@ -1,0 +1,1111 @@
+<?php
+
+
+define('TRANSACTION_BUY_CLASS', 10);
+define('TRANSACTION_BUY_COURSE', 1); //--- Mua khóa học
+define('TRANSACTION_RECHARGE', 2);   //--- Nạp tiền
+
+define('TRANSACTION_PAYMENT_CREDIT', 1); //--- ATM/ Thẻ tín dung
+define('TRANSACTION_PAYMENT_PERSONAL', 2);   //--- Tài khoản cá nhân
+define('TRANSACTION_PAYMENT_MOBILE_CARD', 3); //--- Thẻ cào điện thoại
+define('TRANSACTION_PAYMENT_BANK_TRANSFER', 4);   //--- Chuyển khoản ngân hàng
+define('TRANSACTION_PAYMENT_OFFICE', 5); //--- Thu tiền tại văn phòng
+define('TRANSACTION_PAYMENT_ADMIN_ADD', 6); //--- Admin cộng tiền vào tài khoản user
+define('TRANSACTION_PAYMENT_ADMIN_SUB', 7);  //--- Admin trừ tiền trong tài khoản user
+
+define('TRANSACTION_PAYMENT_CASSIOPEIA_CARD', 8);
+define('TRANSACTION_PAYMENT_CASSIOPEIA_GIFT', 9);
+define('TRANSACTION_PAYMENT_CASSIOPEIA_CLASS', 10);
+
+
+
+
+
+
+function cassiopeia_nl_get_transaction_playment_type($type) {
+  $_playment_type_text = '';
+  switch ($type) {
+    case  TRANSACTION_PAYMENT_CREDIT:
+      $_playment_type_text = 'ATM/ Thẻ tín dung';
+      break;
+    case  TRANSACTION_PAYMENT_PERSONAL:
+      $_playment_type_text = 'Tài khoản cá nhân';
+      break;
+    case  TRANSACTION_PAYMENT_MOBILE_CARD:
+      $_playment_type_text = 'Thẻ cào điện thoại';
+      break;
+    case  TRANSACTION_PAYMENT_BANK_TRANSFER:
+      $_playment_type_text = 'Chuyển khoản ngân hàng';
+      break;
+    case  TRANSACTION_PAYMENT_OFFICE:
+      $_playment_type_text = 'Thu tiền tại văn phòng';
+      break;
+    case  TRANSACTION_PAYMENT_ADMIN_ADD:
+      $_playment_type_text = 'Admin cộng tiền';
+      break;
+    case  TRANSACTION_PAYMENT_ADMIN_SUB:
+      $_playment_type_text = 'Admin trừ tiền';
+      break;
+    case  TRANSACTION_PAYMENT_CASSIOPEIA_CARD:
+      $_playment_type_text = 'Thẻ Englishcenter';
+      break;
+    case  TRANSACTION_PAYMENT_CASSIOPEIA_GIFT:
+      $_playment_type_text = 'Thẻ quà tặng';
+      break;
+  }
+  return $_playment_type_text;
+}
+
+function cassiopeia_nl_get_transaction_type($type) {
+  $_transaction_type_text = '';
+  switch ($type) {
+    case  TRANSACTION_BUY_COURSE:
+      $_transaction_type_text = 'Mua khóa học';
+      break;
+    case  TRANSACTION_RECHARGE:
+      $_transaction_type_text = 'Nạp tiền';
+      break;
+  }
+  return $_transaction_type_text;
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function cassiopeia_nl_menu() {
+  $items = array();
+  $items['admin/config/cassiopeia/general/nl'] = array(
+    'title' => 'Cấu hình ngân lượng',
+    'page callback' => array('drupal_get_form'),
+    'page arguments' => array('cassiopeia_config_nl_form'),
+    'access arguments' => array('cassiopeia nl module'),
+    'file' => 'cassiopeia_nl.inc',
+  );
+
+  $items['admin/config/cassiopeia/payment-form'] = array(
+    'title' => 'Cấu hình form thanh toán',
+    'page callback' => array('drupal_get_form'),
+    'page arguments' => array('cassiopeia_config_payment_form'),
+    'access arguments' => array('cassiopeia nl module'),
+    'file' => 'cassiopeia_nl.inc',
+  );
+
+  $items['payment-complete'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Thanh toán',
+    'page callback' => array('cassiopeia_payment_complete'),
+    'access arguments' => array('access content'),
+    'file' => 'cassiopeia_nl.inc',
+  );
+  return $items;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function cassiopeia_nl_permission() {
+  return array(
+    'cassiopeia nl module' => array(
+      'title' => t('Cassiopeia NL module'),
+      'description' => t('Access for Cassiopeia NL module'),
+    )
+  );
+}
+
+
+function cassiopeia_nl_phonecard_post($code, $type, $pin, $serial) {
+  include_once 'include/MobiCard.php';
+  $call = new MobiCard();
+  $rs = $call->CardPay($pin, $serial, $type, $code, "", "", "");
+  return $rs;
+}
+
+function cassiopeia_nl_build_link($order) {
+  include_once 'include/NL_Checkoutv3.php';
+  $nlcheckout = new NL_CheckOutV3(variable_get('nl_merchant_id', ''), variable_get('nl_merchant_pass', ''), variable_get('nl_email', ''), variable_get('nl_bank_url', ''));
+  $total_amount = $order['total'];
+
+  $array_items = $order['items'];
+
+  $payment_method = $order['payment'];
+  $bank_code = $order['bankcode'];
+  $order_code = $order['code'];
+  $payment_type = '';
+  $discount_amount = 0;
+  $order_description = '';
+  $tax_amount = 0;
+  $fee_shipping = 0;
+  $return_url = $order['return_url'];
+  $cancel_url = $order['cancel_url'];
+  $buyer_fullname = $order['fullname'];
+  $buyer_email = $order['email'];
+  $buyer_mobile = $order['phone'];
+  $buyer_address = $order['address'];
+  $nl_result = NULL;
+
+  if ($payment_method == "VISA") {
+    $nl_result = $nlcheckout->VisaCheckout($order_code, $total_amount, $payment_type, $order_description, $tax_amount,
+      $fee_shipping, $discount_amount, $return_url, $cancel_url, $buyer_fullname, $buyer_email, $buyer_mobile,
+      $buyer_address, $array_items, $bank_code);
+  }
+  elseif ($payment_method == "ATM_ONLINE" && $bank_code != '') {
+    $nl_result = $nlcheckout->BankCheckout($order_code, $total_amount, $bank_code, $payment_type, $order_description, $tax_amount,
+      $fee_shipping, $discount_amount, $return_url, $cancel_url, $buyer_fullname, $buyer_email, $buyer_mobile,
+      $buyer_address, $array_items);
+  }
+  elseif ($payment_method == "IB_ONLINE") {
+    $nl_result = $nlcheckout->IBCheckout($order_code, $total_amount, $bank_code, $payment_type, $order_description, $tax_amount, $fee_shipping, $discount_amount, $return_url, $cancel_url, $buyer_fullname, $buyer_email, $buyer_mobile, $buyer_address, $array_items);
+  }
+
+  return ($nl_result && $nl_result->error_code == '00') ? $nl_result->checkout_url : '';
+}
+
+function cassiopeia_nl_check_link($token) {
+  include_once 'include/NL_Checkoutv3.php';
+  $nlcheckout = new NL_CheckOutV3(variable_get('nl_merchant_id', ''), variable_get('nl_merchant_pass', ''), variable_get('nl_email', ''), variable_get('nl_bank_url', ''));
+  $nl_result = $nlcheckout->GetTransactionDetail($token);
+  return $nl_result;
+}
+
+
+function cassiopeia_nl_get_transaction_message($error_code) {
+  $arrCode = array(
+    '00' => 'Thành công',
+    '99' => 'Lỗi chưa xác minh',
+    '06' => 'Mã merchant không tồn tại hoặc bị khóa',
+    '02' => 'Địa chỉ IP truy cập bị từ chối',
+    '03' => 'Mã checksum không chính xác, truy cập bị từ chối',
+    '04' => 'Tên hàm API do merchant gọi tới không hợp lệ (không tồn tại)',
+    '05' => 'Sai version của API',
+    '07' => 'Sai mật khẩu của merchant',
+    '08' => 'Địa chỉ email tài khoản nhận tiền không tồn tại',
+    '09' => 'Tài khoản nhận tiền đang bị phong tỏa giao dịch',
+    '10' => 'Mã đơn hàng không hợp lệ',
+    '11' => 'Số tiền giao dịch lớn hơn hoặc nhỏ hơn quy định',
+    '12' => 'Loại tiền tệ không hợp lệ',
+    '29' => 'Token không tồn tại',
+    '80' => 'Không thêm được đơn hàng',
+    '81' => 'Đơn hàng chưa được thanh toán',
+    '110' => 'Địa chỉ email tài khoản nhận tiền không phải email chính',
+    '111' => 'Tài khoản nhận tiền đang bị khóa',
+    '113' => 'Tài khoản nhận tiền chưa cấu hình là người bán nội dung số',
+    '114' => 'Giao dịch đang thực hiện, chưa kết thúc',
+    '115' => 'Giao dịch bị hủy',
+    '118' => 'tax_amount không hợp lệ',
+    '119' => 'discount_amount không hợp lệ',
+    '120' => 'fee_shipping không hợp lệ',
+    '121' => 'return_url không hợp lệ',
+    '122' => 'cancel_url không hợp lệ',
+    '123' => 'items không hợp lệ',
+    '124' => 'transaction_info không hợp lệ',
+    '125' => 'quantity không hợp lệ',
+    '126' => 'order_description không hợp lệ',
+    '127' => 'affiliate_code không hợp lệ',
+    '128' => 'time_limit không hợp lệ',
+    '129' => 'buyer_fullname không hợp lệ',
+    '130' => 'buyer_email không hợp lệ',
+    '131' => 'buyer_mobile không hợp lệ',
+    '132' => 'buyer_address không hợp lệ',
+    '133' => 'total_item không hợp lệ',
+    '134' => 'payment_method, bank_code không hợp lệ',
+    '135' => 'Lỗi kết nối tới hệ thống ngân hàng',
+    '140' => 'Đơn hàng không hỗ trợ thanh toán trả góp',
+  );
+  return $arrCode[(string) $error_code];
+}
+
+;
+
+
+function cassiopeia_nl_get_bank($id = NULL) {
+  $bankcode = array(
+    'BIDV' => 'Ngân hàng TMCP Đầu tư & Phát triển Việt Nam',
+    'VCB' => 'Ngân hàng TMCP Ngoại Thương Việt Nam',
+    'DAB' => 'Ngân hàng Đông Á',
+    'TCB' => 'Ngân hàng Kỹ Thương',
+    'MB' => 'Ngân hàng Quân Đội',
+    'VIB' => 'Ngân hàng Quốc tế',
+    'ICB' => 'Ngân hàng Công Thương Việt Nam',
+    'EXB' => 'Ngân hàng Xuất Nhập Khẩu',
+    'ACB' => 'Ngân hàng Á Châu',
+    'HDB' => 'Ngân hàng Phát triển Nhà TPHCM',
+    'MSB' => 'Ngân hàng Hàng Hải',
+    'NVB' => 'Ngân hàng Nam Việt',
+    'VAB' => 'Ngân hàng Việt Á',
+    'VPB' => 'Ngân Hàng Việt Nam Thịnh Vượng',
+    'SCB' => 'Ngân hàng Sài Gòn Thương tín',
+    'PGB' => 'Ngân hàng Xăng dầu Petrolimex',
+    'GPB' => 'Ngân hàng TMCP Dầu khí Toàn Cầu',
+    'AGB' => 'Ngân hàng Nông nghiệp & Phát triển nông thôn',
+    'SGB' => 'Ngân hàng Sài Gòn Công Thương',
+    'BAB' => 'Ngân hàng Bắc Á',
+    'TPB' => 'Tền phong bank',
+    'NAB' => 'Ngân hàng Nam Á',
+    'SHB' => 'Ngân hàng TMCP Sài Gòn - Hà Nội (SHB)',
+    'OJB' => 'Ngân hàng TMCP Đại Dương (OceanBank)',
+    'VISA' => 'Visa',
+    'MASTER' => 'Master',
+  );
+
+  if (isset($id)) {
+    if (array_key_exists($id, $bankcode)) {
+      return $bankcode[$id];
+    }
+    else {
+
+    }
+  }
+  else {
+    return $bankcode;
+  }
+}
+
+
+function  cassiopeia_nl_get_creditcard_option_payment($code) {
+  $_name = '';
+  switch ($code) {
+    case  'ATM_ONLINE':
+      $_name = 'ATM ONLINE';
+      break;
+    case  'IB_ONLINE':
+      $_name = 'IB ONLINE';
+      break;
+    case  'VISA':
+      $_name = 'VISA';
+      break;
+  }
+
+  return $_name;
+}
+
+function  cassiopeia_nl_get_mobilecard_option_payment($code) {
+  $_name = '';
+  switch ($code) {
+    case  'VMS':
+      $_name = 'Mobifone';
+      break;
+    case  'VNP':
+      $_name = 'Vina phone';
+      break;
+    case  'VIETTEL':
+      $_name = 'Viettel';
+      break;
+  }
+  return $_name;
+}
+
+
+function cassiopeia_payment_creditcard_form($form, &$form_state) {
+  $form['#attached']['css'][] = drupal_get_path('module', 'cassiopeia_nl') . '/css/nl.css';
+  $form['option_payment'] = array(
+    '#type' => 'radios',
+    '#title' => 'Hình thức thanh toán',
+    '#options' => array(
+      'ATM_ONLINE' => 'Thanh toán online bằng thẻ ngân hàng nội địa',
+      'IB_ONLINE' => 'Thanh toán bằng I-Banking',
+      'VISA' => 'Thanh toán bằng thẻ Visa hoặc MasterCard',
+    ),
+    '#required' => TRUE,
+    '#ajax' => array(
+      'callback' => '_cassiopeia_payment_creditcar_form_ajax',
+      'wrapper' => 'wrap-form-creditcard',
+    )
+  );
+  $bankcode = cassiopeia_nl_get_bank();
+  $key_atm = array_keys($bankcode);
+  $key_atm = array_diff($key_atm, array('VISA', 'MASTER'));
+  $ops_banks = array(
+    'ATM_ONLINE' => $key_atm,
+    'IB_ONLINE' => array('BIDV', 'VCB', 'DAB', 'TCB'),
+    'VISA' => array(
+      'VISA',
+      'MASTER'
+    ),
+  );
+  if (isset($form_state['values']['option_payment'])) {
+    $ops_bank = $ops_banks[$form_state['values']['option_payment']];
+    $ops = array();
+    foreach ($ops_bank as $key) {
+      if (isset($bankcode[$key])) {
+        $ops[$key] = '<i class="' . $key . '" title="' . $bankcode[$key] . '"></i>';
+      }
+    }
+    $_note_message = '';
+    if (in_array($form_state['values']['option_payment'], array(
+      'ATM_ONLINE',
+      'IB_ONLINE'
+    ))) {
+      $_note_message = '<div class="bank-code-note">Lưu ý: Bạn cần đăng ký Internet-Banking hoặc dịch vụ thanh toán trực tuyến tại ngân hàng trước khi thực hiện.</div>';
+    }
+    $form['bankcode'] = array(
+      '#type' => 'radios',
+      '#title' => 'Ngân hàng',
+      '#required' => TRUE,
+      '#options' => $ops,
+      '#prefix' => $_note_message,
+    );
+  }
+  $form['#prefix'] = '<div id="wrap-form-creditcard">';
+  $form['#suffix'] = '</div>';
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Thanh toán',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function _cassiopeia_payment_creditcar_form_ajax($form) {
+  return $form;
+}
+
+
+function cassiopeia_payment_creditcard_form_submit($form, $form_state) {
+  global $user;
+
+  if (!empty($user->uid) && !empty($form_state['values']['bankcode']) && !empty($form_state['values']['option_payment'])) {
+    $_user = user_load($user->uid);
+    $_total = 0;
+    $_items = array();
+    $_item_index = 0;
+    if (!empty($_SESSION['cart'])) {
+      foreach ($_SESSION['cart'] as $_key => $_value) {
+        $_item_index = $_item_index + 1;
+        $__total = 0;
+        if (!empty($_value->field_ctype_course_price['und'][0]['value'])) {
+          $__total = $_value->field_ctype_course_price['und'][0]['value'];
+          $_item = array(
+            'item_name' . $_item_index => $_value->title,
+            'item_quantity' . $_item_index => 1,
+            'item_amount' . $_item_index => $__total,
+            'item_url' . $_item_index => url('node/' . $_value->nid, array('absolute' => TRUE))
+          );
+          $_items[] = $_item;
+        }
+        $_total = $_total + $__total;
+      }
+      if ($_total > 0) {
+        $code = $user->uid . '-' . REQUEST_TIME;
+        $order = array(
+          'code' => $code,
+          'total' => $_total,
+          'items' => $_items,
+          'cancel_url' => urlencode(url('user/payment/credit', array(
+            'absolute' => TRUE,
+            'query' => array('orderid' => $code)
+          ))),
+          'return_url' => url('payment-complete', array('absolute' => TRUE)),
+          'fullname' => !empty($_user->field_account_full_name['und'][0]['value'])?$_user->field_account_full_name['und'][0]['value']:' ',
+          'email' => $_user->mail,
+          'phone' => !empty($_user->field_account_phone['und'][0]['value'])?$_user->field_account_phone['und'][0]['value']:' ',
+          'address' => !empty($_user->field_account_address['und'][0]['value'])?$_user->field_account_address['und'][0]['value']:' ',
+          'bankcode' => $form_state['values']['bankcode'],
+          'payment' => $form_state['values']['option_payment'],
+        );
+        $url = cassiopeia_nl_build_link($order);
+        if ($url instanceof SimpleXMLElement) {
+          $url = (string) $url;
+        }
+        if (!empty($url)) {
+          drupal_session_commit();
+          drupal_goto($url);
+        }
+        else {
+          drupal_set_message('Lựa chọn không phù hợp');
+        }
+
+      }
+    }
+  }
+
+}
+
+function cassiopeia_payment_mobile_card_form($form, &$form_state) {
+  $form['type'] = array(
+    '#type' => 'radios',
+    '#title' => 'Thẻ cào',
+    '#options' => array(
+      'VMS' => '<img src="/sites/default/files/nl/mobifone.png" />',
+      'VNP' => '<img src="/sites/default/files/nl/vina.png" />',
+      'VTT' => '<img src="/sites/default/files/nl/viettel.png" />'
+    ),
+    '#required' => TRUE,
+  );
+
+  $form['pin'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Nhập mã thẻ cào',
+    '#required' => TRUE,
+  );
+
+  $form['serial'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Nhập số seri',
+    '#required' => TRUE,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Thanh toán',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_mobile_card_form_submit($form, $form_state) {
+  global $user;
+  $code = $user->uid . '-' . REQUEST_TIME;
+  $_result = cassiopeia_nl_phonecard_post($code, $form_state['values']['type'], $form_state['values']['pin'], $form_state['values']['serial']);
+  if (!empty($_result)) {
+    if ($_result->error_code == '00') {
+      if (!empty($_SESSION['cart'])) {
+        $_total = 0;
+        $_items = array();
+        $_item_index = 0;
+        foreach ($_SESSION['cart'] as $_key => $_value) {
+          $_item_index = $_item_index + 1;
+          $__total = 0;
+          if (!empty($_value->field_ctype_course_price['und'][0]['value'])) {
+            $__total = $_value->field_ctype_course_price['und'][0]['value'];
+            if (!empty($_value->field_ctype_course_sale_off['und'][0]['value'])) {
+              $__total = $__total - $_value->field_ctype_course_sale_off['und'][0]['value'];
+            }
+            $_items[] = $_value;
+          }
+          $_total = $_total + $__total;
+        }
+
+        if ($_result->card_amount >= $_total) {
+          $_transaction_id = db_insert('transactions')->fields(array(
+            'uid' => $user->uid,
+            'total_amount' => $_result->card_amount,
+            'type' => TRANSACTION_BUY_COURSE,
+            'payment_type' => TRANSACTION_PAYMENT_MOBILE_CARD,
+            'created' => REQUEST_TIME
+          ))->execute();
+
+          $_mobilecard_transfer_id = db_insert('mobile_card_transfers')
+            ->fields(array(
+              'tid' => $_transaction_id,
+              'order_code' => $_result->order_code,
+              'pin_card' => $_result->pin_card,
+              'card_serial' => $_result->card_serial,
+              'type_card' => $_result->type_card,
+            ))
+            ->execute();
+
+          $user_buy_course_values = array();
+          foreach ($_SESSION['cart'] as $_key => $_value) {
+            $__value = array();
+            $__value['tid'] = $_transaction_id;
+            $__value['nid'] = $_value->nid;
+            $__value['amount'] = $_value->field_ctype_course_price['und'][0]['value'];
+            if (!empty($_value->field_ctype_course_sale_off['und'][0]['value'])) {
+              $__value['amount'] = $__value['amount'] - $_value->field_ctype_course_sale_off['und'][0]['value'];
+            }
+            $user_buy_course_values[] = $__value;
+          }
+
+          $_user_buy_course_insert_query = db_insert('user_buy_course')->fields(array(
+            'tid',
+            'nid',
+            'amount'
+          ));
+
+          foreach ($user_buy_course_values as $record) {
+            $_user_buy_course_insert_query->values($record);
+          }
+          $_user_buy_course_insert_query->execute();
+
+
+          $user_course_values = array();
+          foreach ($_SESSION['cart'] as $_key => $_value) {
+            $__value = array();
+            $__value['tid'] = $_transaction_id;
+            $__value['uid'] = $user->uid;
+            $__value['nid'] = $_value->nid;
+            $__value['locked'] = 0;
+            $user_course_values[] = $__value;
+          }
+          $_user_course_insert_query = db_insert('user_courses')->fields(array(
+            'tid',
+            'uid',
+            'nid',
+            'locked'
+          ));
+
+          foreach ($user_course_values as $record) {
+            $_user_course_insert_query->values($record);
+          }
+          $_user_course_insert_query->execute();
+
+          $_user_course_insert_query = db_insert('user_courses')->fields(array(
+            'tid',
+            'uid',
+            'nid',
+            'locked'
+          ));
+
+          foreach ($user_course_values as $record) {
+            $_user_course_insert_query->values($record);
+          }
+          $_user_course_insert_query->execute();
+          unset($_SESSION['cart']);
+          drupal_session_commit();
+          drupal_goto('user/'.$user->uid.'/courses');
+        }
+        else {
+          $transaction = db_transaction();
+          try {
+            $_transaction_id = db_insert('transactions')->fields(array(
+              'uid' => $user->uid,
+              'total_amount' => $_result->card_amount,
+              'type' => TRANSACTION_RECHARGE,
+              'payment_type' => TRANSACTION_PAYMENT_MOBILE_CARD,
+              'created' => REQUEST_TIME
+            ))->execute();
+
+            $_mobilecard_transfer_id = db_insert('mobile_card_transfers')
+              ->fields(array(
+                'tid' => $_transaction_id,
+                'order_code' => $_result->order_code,
+                'pin_card' => $_result->pin_card,
+                'card_serial' => $_result->card_serial,
+                'type_card' => $_result->type_card,
+              ))
+              ->execute();
+          } catch (Exception $e) {
+            $transaction->rollback();
+          }
+        }
+      }
+      else {
+        $transaction = db_transaction();
+        try {
+          $_transaction_id = db_insert('transactions')->fields(array(
+            'uid' => $user->uid,
+            'total_amount' => $_result->card_amount,
+            'type' => TRANSACTION_RECHARGE,
+            'payment_type' => TRANSACTION_PAYMENT_MOBILE_CARD,
+            'created' => REQUEST_TIME
+          ))->execute();
+
+          $_mobilecard_transfer_id = db_insert('mobile_card_transfers')
+            ->fields(array(
+              'tid' => $_transaction_id,
+              'order_code' => $_result->order_code,
+              'pin_card' => $_result->pin_card,
+              'card_serial' => $_result->card_serial,
+              'type_card' => $_result->type_card,
+            ))
+            ->execute();
+        } catch (Exception $e) {
+          $transaction->rollback();
+        }
+      }
+    }
+    else {
+      drupal_set_message($_result->error_message, 'error');
+    }
+  }
+  else {
+    drupal_set_message('Hệ thống đang bận vui lòng quay lại sau it phut.', 'error');
+  }
+
+}
+
+function cassiopeia_payment_bank_transfer_form($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Xác nhận đơn hàng',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_bank_transfer_form_submit($form, $form_state) {
+
+}
+
+function cassiopeia_payment_office_form($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Xác nhận đơn hàng',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_office_form_submit($form, $form_state) {
+
+}
+
+function cassiopeia_payment_personal_form($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Thanh toán',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_personal_form_submit($form, $form_state) {
+  global $user;
+  if (!empty($_SESSION['cart']) && !empty($user->uid)) {
+    $_user = user_load($user->uid);
+    $_total = 0;
+    foreach ($_SESSION['cart'] as $_key => $_value) {
+      $_total = $_total + $_value->field_ctype_course_price['und'][0]['value'];
+      if (!empty($_value->field_ctype_course_sale_off['und'][0]['value'])) {
+        $_total = $_total - $_value->field_ctype_course_sale_off['und'][0]['value'];
+      }
+    }
+
+    if ($_user->field_account_balance['und'][0]['value'] >= $_total) {
+
+      $transaction = db_transaction();
+      try {
+        $_transaction_id = db_insert('transactions')->fields(array(
+          'uid' => $user->uid,
+          'total_amount' => $_total,
+          'type' => TRANSACTION_BUY_COURSE,
+          'payment_type' => TRANSACTION_PAYMENT_PERSONAL,
+          'created' => REQUEST_TIME
+        ))->execute();
+
+        $user_buy_course_values = array();
+        foreach ($_SESSION['cart'] as $_key => $_value) {
+          $__value = array();
+          $__value['tid'] = $_transaction_id;
+          $__value['nid'] = $_value->nid;
+          $__value['amount'] = $_value->field_ctype_course_price['und'][0]['value'];
+          if (!empty($_value->field_ctype_course_sale_off['und'][0]['value'])) {
+            $__value['amount'] = $__value['amount'] - $_value->field_ctype_course_sale_off['und'][0]['value'];
+          }
+          $user_buy_course_values[] = $__value;
+        }
+        $_user_buy_course_insert_query = db_insert('user_buy_course')->fields(array(
+          'tid',
+          'nid',
+          'amount'
+        ));
+
+        foreach ($user_buy_course_values as $record) {
+          $_user_buy_course_insert_query->values($record);
+        }
+        $_user_buy_course_insert_query->execute();
+
+
+        $user_course_values = array();
+        foreach ($_SESSION['cart'] as $_key => $_value) {
+          $__value = array();
+          $__value['tid'] = $_transaction_id;
+          $__value['uid'] = $_user->uid;
+          $__value['nid'] = $_value->nid;
+          $__value['locked'] = 0;
+          $user_course_values[] = $__value;
+        }
+
+        $_user_course_insert_query = db_insert('user_courses')->fields(array(
+          'tid',
+          'uid',
+          'nid',
+          'locked'
+        ));
+
+        foreach ($user_course_values as $record) {
+          $_user_course_insert_query->values($record);
+        }
+        $_user_course_insert_query->execute();
+
+        $_user->field_account_balance['und'][0]['value'] = $_user->field_account_balance['und'][0]['value'] - $_total;
+        user_save($_user);
+
+        unset($_SESSION['cart']);
+        drupal_session_commit();
+        drupal_goto('user/' . $user->uid . '/courses');
+
+      } catch (Exception $e) {
+        $transaction->rollback();
+      }
+    }
+  }
+}
+
+
+
+
+/**
+ * Implements hook_mail().
+ */
+//function cassiopeia_nl_mail($key, &$message, $params)
+//{
+//  $headers = array(
+//    'MIME-Version' => '1.0',
+//    'Content-Type' => 'text/html; charset=UTF-8; format=flowed',
+//    'Content-Transfer-Encoding' => '8Bit',
+//    'X-Mailer' => 'Drupal'
+//  );
+//}
+//
+//
+//function cassiopeia_nl_get_mail_template($data, $type)
+//{
+//  global $base_url;
+//  $_output = '';
+//  return $_output;
+//}
+
+
+/**
+ * Implements hook_theme().
+ */
+//function cassiopeia_nl_theme($existing, $type, $theme, $path) {
+//  $path = drupal_get_path('module', 'cassiopeia_nl') . '/templates/email';
+//
+//}
+
+
+
+function cassiopeia_payment_class_creditcard_form_submit($form, $form_state) {
+  global $user;
+
+  if (!empty($user->uid) && !empty($form_state['values']['bankcode']) && !empty($form_state['values']['option_payment'])) {
+    $_user = user_load($user->uid);
+    $_total = 0;
+    $_items = array();
+    $_item_index = 0;
+    if (!empty($_SESSION['cart_class'])) {
+      foreach ($_SESSION['cart_class'] as $_key => $_value) {
+        $_item_index = $_item_index + 1;
+        $__total = 0;
+        if (!empty($_value->field_ctype_class_price['und'][0]['value'])) {
+          $__total = $_value->field_ctype_class_price['und'][0]['value'];
+          $_item = array(
+            'item_name' . $_item_index => $_value->title,
+            'item_quantity' . $_item_index => 1,
+            'item_amount' . $_item_index => $__total,
+            'item_url' . $_item_index => url('node/' . $_value->nid, array('absolute' => TRUE))
+          );
+          $_items[] = $_item;
+        }
+        $_total = $_total + $__total;
+      }
+      if ($_total > 0) {
+        $code = $user->uid . '-' . REQUEST_TIME;
+        $order = array(
+          'code' => $code,
+          'total' => $_total,
+          'items' => $_items,
+          'cancel_url' => urlencode(url('user/payment-class/credit', array(
+            'absolute' => TRUE,
+            'query' => array('orderid' => $code)
+          ))),
+          'return_url' => url('payment-class-complete', array('absolute' => TRUE)),
+          'fullname' => !empty($_user->field_account_full_name['und'][0]['value'])?$_user->field_account_full_name['und'][0]['value']:' ',
+          'email' => $_user->mail,
+          'phone' => !empty($_user->field_account_phone['und'][0]['value'])?$_user->field_account_phone['und'][0]['value']:' ',
+          'address' => !empty($_user->field_account_address['und'][0]['value'])?$_user->field_account_address['und'][0]['value']:' ',
+          'bankcode' => $form_state['values']['bankcode'],
+          'payment' => $form_state['values']['option_payment'],
+        );
+        $url = cassiopeia_nl_build_link($order);
+        if ($url instanceof SimpleXMLElement) {
+          $url = (string) $url;
+        }
+        if (!empty($url)) {
+          drupal_session_commit();
+          drupal_goto($url);
+        }
+        else {
+          drupal_set_message('Lựa chọn không phù hợp');
+        }
+
+      }
+    }
+  }
+
+}
+
+function cassiopeia_payment_class_mobile_card_form($form, &$form_state) {
+  $form['type'] = array(
+    '#type' => 'radios',
+    '#title' => 'Thẻ cào',
+    '#options' => array(
+      'VMS' => '<img src="/sites/default/files/nl/mobifone.png" />',
+      'VNP' => '<img src="/sites/default/files/nl/vina.png" />',
+      'VTT' => '<img src="/sites/default/files/nl/viettel.png" />'
+    ),
+    '#required' => TRUE,
+  );
+
+  $form['pin'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Nhập mã thẻ cào',
+    '#required' => TRUE,
+  );
+
+  $form['serial'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Nhập số seri',
+    '#required' => TRUE,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Thanh toán',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_class_mobile_card_form_submit($form, $form_state) {
+  global $user;
+  $code = $user->uid . '-' . REQUEST_TIME;
+  $_result = cassiopeia_nl_phonecard_post($code, $form_state['values']['type'], $form_state['values']['pin'], $form_state['values']['serial']);
+  if (!empty($_result)) {
+    if ($_result->error_code == '00') {
+      if (!empty($_SESSION['cart_class'])) {
+        $_total = 0;
+        $_items = array();
+        $_item_index = 0;
+        foreach ($_SESSION['cart_class'] as $_key => $_value) {
+          $_item_index = $_item_index + 1;
+          $__total = 0;
+          if (!empty($_value->field_ctype_class_price['und'][0]['value'])) {
+            $__total = $_value->field_ctype_class_price['und'][0]['value'];
+            if (!empty($_value->field_ctype_course_sale_off['und'][0]['value'])) {
+              $__total = $__total - $_value->field_ctype_course_sale_off['und'][0]['value'];
+            }
+            $_items[] = $_value;
+          }
+          $_total = $_total + $__total;
+        }
+
+        if ($_result->card_amount >= $_total) {
+          $_transaction_id = db_insert('transactions')->fields(array(
+            'uid' => $user->uid,
+            'total_amount' => $_result->card_amount,
+            'type' => TRANSACTION_BUY_CLASS,
+            'payment_type' => TRANSACTION_PAYMENT_MOBILE_CARD,
+            'created' => REQUEST_TIME
+          ))->execute();
+
+          $_mobilecard_transfer_id = db_insert('mobile_card_transfers')
+            ->fields(array(
+              'tid' => $_transaction_id,
+              'order_code' => $_result->order_code,
+              'pin_card' => $_result->pin_card,
+              'card_serial' => $_result->card_serial,
+              'type_card' => $_result->type_card,
+            ))
+            ->execute();
+
+          $user_course_values = array();
+          foreach ($_SESSION['cart_class'] as $_key => $_value) {
+            $__value = array();
+            $__value['tid'] = $_transaction_id;
+            $__value['uid'] = $user->uid;
+            $__value['nid'] = $_value->nid;
+            $__value['locked'] = 0;
+            $user_course_values[] = $__value;
+          }
+          $_user_buy_course_insert_query = db_insert('user_buy_class')->fields(array(
+            'tid',
+            'nid',
+            'amount'
+          ));
+
+          foreach ($user_course_values as $record) {
+            $_user_buy_course_insert_query->values($record);
+          }
+          $_user_buy_course_insert_query->execute();
+
+
+          foreach ($_SESSION['cart_class'] as $_key => $_value) {
+            $_class = node_load($_value->nid);
+            $_class->field_ctype_class_students['und'][] = array('target_id'=> $user->uid);
+            node_save($_class);
+
+          }
+
+
+          unset($_SESSION['cart_class']);
+          drupal_session_commit();
+          drupal_goto('user/'.$user->uid.'/class');
+        }else {
+          $transaction = db_transaction();
+          try {
+            $_transaction_id = db_insert('transactions')->fields(array(
+              'uid' => $user->uid,
+              'total_amount' => $_result->card_amount,
+              'type' => TRANSACTION_RECHARGE,
+              'payment_type' => TRANSACTION_PAYMENT_MOBILE_CARD,
+              'created' => REQUEST_TIME
+            ))->execute();
+
+            $_mobilecard_transfer_id = db_insert('mobile_card_transfers')
+              ->fields(array(
+                'tid' => $_transaction_id,
+                'order_code' => $_result->order_code,
+                'pin_card' => $_result->pin_card,
+                'card_serial' => $_result->card_serial,
+                'type_card' => $_result->type_card,
+              ))
+              ->execute();
+          } catch (Exception $e) {
+            $transaction->rollback();
+          }
+        }
+      }
+      else {
+        $transaction = db_transaction();
+        try {
+          $_transaction_id = db_insert('transactions')->fields(array(
+            'uid' => $user->uid,
+            'total_amount' => $_result->card_amount,
+            'type' => TRANSACTION_RECHARGE,
+            'payment_type' => TRANSACTION_PAYMENT_MOBILE_CARD,
+            'created' => REQUEST_TIME
+          ))->execute();
+
+          $_mobilecard_transfer_id = db_insert('mobile_card_transfers')
+            ->fields(array(
+              'tid' => $_transaction_id,
+              'order_code' => $_result->order_code,
+              'pin_card' => $_result->pin_card,
+              'card_serial' => $_result->card_serial,
+              'type_card' => $_result->type_card,
+            ))
+            ->execute();
+        } catch (Exception $e) {
+          $transaction->rollback();
+        }
+      }
+    }
+    else {
+      drupal_set_message($_result->error_message, 'error');
+    }
+  }
+  else {
+    drupal_set_message('Hệ thống đang bận vui lòng quay lại sau it phut.', 'error');
+  }
+
+}
+
+function cassiopeia_payment_class_bank_transfer_form($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Xác nhận đơn hàng',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_class_bank_transfer_form_submit($form, $form_state) {
+
+}
+
+function cassiopeia_payment_class_office_form($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Xác nhận đơn hàng',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_class_office_form_submit($form, $form_state) {
+
+}
+
+function cassiopeia_payment_class_personal_form($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Thanh toán',
+    '#attributes' => array('class' => array('btn btn-primary'))
+  );
+  return $form;
+}
+
+function cassiopeia_payment_class_personal_form_submit($form, $form_state) {
+  global $user;
+  if (!empty($_SESSION['cart_class']) && !empty($user->uid)) {
+    $_user = user_load($user->uid);
+    $_total = 0;
+    foreach ($_SESSION['cart_class'] as $_key => $_value) {
+      $_total = $_total + $_value->field_ctype_class_price['und'][0]['value'];
+      if (!empty($_value->field_ctype_class_sale_off['und'][0]['value'])) {
+        $_total = $_total - $_value->field_ctype_class_sale_off['und'][0]['value'];
+      }
+    }
+
+    if ($_user->field_account_balance['und'][0]['value'] >= $_total) {
+
+      $transaction = db_transaction();
+      try {
+        $_transaction_id = db_insert('transactions')->fields(array(
+          'uid' => $user->uid,
+          'total_amount' => $_total,
+          'type' => TRANSACTION_BUY_CLASS,
+          'payment_type' => TRANSACTION_PAYMENT_PERSONAL,
+          'created' => REQUEST_TIME
+        ))->execute();
+
+        $user_buy_course_values = array();
+        foreach ($_SESSION['cart_class'] as $_key => $_value) {
+          $__value = array();
+          $__value['tid'] = $_transaction_id;
+          $__value['nid'] = $_value->nid;
+          $__value['amount'] = $_value->field_ctype_class_price['und'][0]['value'];
+          if (!empty($_value->field_ctype_class_sale_off['und'][0]['value'])) {
+            $__value['amount'] = $__value['amount'] - $_value->field_ctype_class_sale_off['und'][0]['value'];
+          }
+          $user_buy_course_values[] = $__value;
+        }
+        $_user_buy_course_insert_query = db_insert('user_buy_class')->fields(array(
+          'tid',
+          'nid',
+          'amount'
+        ));
+
+        foreach ($user_buy_course_values as $record) {
+          $_user_buy_course_insert_query->values($record);
+        }
+        $_user_buy_course_insert_query->execute();
+
+        $_user->field_account_balance['und'][0]['value'] = $_user->field_account_balance['und'][0]['value'] - $_total;
+        user_save($_user);
+
+
+        foreach ($_SESSION['cart_class'] as $_key => $_value) {
+          $check_in_class = FALSE;
+          $_class = node_load($_value->nid);
+          if(empty($_class->field_ctype_class_students['und'])) {
+            $_class->field_ctype_class_students['und'][] = array('target_id'=> $user->uid);
+            node_save($_class);
+          }else {
+            foreach ($_class->field_ctype_class_students['und'] as $key => $value) {
+              if($value['target_id'] == $_user->uid) {
+                $check_in_class = TRUE;
+              }
+            }
+          }
+          if($check_in_class == FALSE) {
+            $_class->field_ctype_class_students['und'][] = array('target_id'=> $user->uid);
+            node_save($_class);
+          }
+        }
+
+        unset($_SESSION['cart_class']);
+        drupal_session_commit();
+        drupal_goto('user/' . $user->uid . '/class');
+
+      } catch (Exception $e) {
+        $transaction->rollback();
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+name = Cassiopeia Guest Post
+description = Cassiopeia Guest Post
+
+package = Cassiopeia
+
+core = 7.x
+version = "7.x-1.05"
+datestamp = "1419029284"

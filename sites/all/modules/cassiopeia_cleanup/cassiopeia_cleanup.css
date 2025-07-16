@@ -1,0 +1,37 @@
+.cleanup-warning {
+  border: 2px solid #E62600 !important;
+  background-color: #FFEBE6 !important;
+  color: #E62600 !important;
+  font-weight: bold;
+  padding: 15px !important;
+  margin-bottom: 20px !important;
+}
+
+.button--danger {
+  background-color: #E62600 !important;
+  color: white !important;
+  font-weight: bold;
+  border: none !important;
+  padding: 10px 15px !important;
+}
+
+.form-item-security-confirm-text {
+  margin-top: 20px !important;
+}
+
+#edit-security-confirm-text {
+  font-weight: bold;
+  padding: 10px;
+}
+
+#edit-cleanup-options {
+  border: 1px solid #ccc;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+#edit-security {
+  border: 1px solid #ccc;
+  padding: 15px;
+  background-color: #fff9e6;
+}

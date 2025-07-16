@@ -1,0 +1,13 @@
+name = Cassiopeia
+description = Cassiopeia module
+
+package = Custom
+core = 7.x
+version = 7.x-1.0
+core = "7.x"
+datestamp = "1419029284"
+
+files[] = cassiopeia.module
+files[] = cassiopeia.inc
+files[] = cassiopeia.queue.inc
+files[] = cassiopeia.extension.inc

@@ -1,0 +1,258 @@
+<?php
+/**
+ * @file
+ * Module tối ưu cơ sở dữ liệu cho Cassiopeia.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function cassiopeia_db_optimize_menu() {
+  $items = array();
+
+  $items['admin/config/system/cassiopeia-db-optimize'] = array(
+    'title' => 'Tối ưu cơ sở dữ liệu',
+    'description' => 'Cấu hình tối ưu cơ sở dữ liệu cho Cassiopeia',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cassiopeia_db_optimize_admin_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'cassiopeia_db_optimize.admin.inc',
+  );
+
+  $items['admin/config/system/cassiopeia-db-optimize/manual-optimize'] = array(
+    'title' => 'Tối ưu thủ công',
+    'description' => 'Chạy tối ưu cơ sở dữ liệu thủ công',
+    'page callback' => 'cassiopeia_db_optimize_manual',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'cassiopeia_db_optimize.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function cassiopeia_db_optimize_cron() {
+  // Kiểm tra xem đã đến thời gian làm sạch chưa
+  $last_cleanup = variable_get('cassiopeia_db_optimize_last_cleanup', 0);
+  $cleanup_interval = variable_get('cassiopeia_db_optimize_cleanup_interval', 86400); // Mặc định 1 ngày
+
+  if (REQUEST_TIME - $last_cleanup > $cleanup_interval) {
+    // Làm sạch log
+    _cassiopeia_db_optimize_cleanup_watchdog();
+
+    // Lưu trữ dữ liệu cũ
+    _cassiopeia_db_optimize_archive_old_data();
+
+    // Làm sạch cache
+    _cassiopeia_db_optimize_cleanup_cache();
+
+    // Tối ưu bảng
+    _cassiopeia_db_optimize_optimize_tables();
+
+    // Cập nhật thời gian làm sạch
+    variable_set('cassiopeia_db_optimize_last_cleanup', REQUEST_TIME);
+  }
+}
+
+/**
+ * Làm sạch watchdog logs.
+ */
+function _cassiopeia_db_optimize_cleanup_watchdog() {
+  $retention = variable_get('cassiopeia_db_optimize_watchdog_retention', 30);
+  $threshold = REQUEST_TIME - $retention * 86400;
+
+  db_delete('watchdog')
+    ->condition('timestamp', $threshold, '<')
+    ->execute();
+
+  watchdog('cassiopeia_db_optimize', 'Đã làm sạch watchdog logs cũ (hơn @days ngày)', array('@days' => $retention), WATCHDOG_INFO);
+}
+
+/**
+ * Lưu trữ dữ liệu cũ sang bảng lưu trữ.
+ */
+function _cassiopeia_db_optimize_archive_old_data() {
+  $retention = variable_get('cassiopeia_db_optimize_backlink_retention', 365);
+  $threshold = REQUEST_TIME - $retention * 86400;
+
+  // Tìm các bản ghi cũ trong bảng backlink
+  $old_backlinks = db_select('tbl_backlink', 'b')
+    ->fields('b')
+    ->condition('changed', $threshold, '<')
+    ->range(0, 1000) // Giới hạn số lượng mỗi lần chạy cron
+    ->execute()
+    ->fetchAll();
+
+  $count = 0;
+  foreach ($old_backlinks as $backlink) {
+    // Chèn vào bảng lưu trữ
+    db_insert('tbl_backlink_archive')
+      ->fields((array) $backlink)
+      ->execute();
+
+    // Xóa từ bảng chính
+    db_delete('tbl_backlink')
+      ->condition('id', $backlink->id)
+      ->execute();
+
+    $count++;
+  }
+
+  if ($count > 0) {
+    watchdog('cassiopeia_db_optimize', 'Đã lưu trữ @count bản ghi backlink cũ', array('@count' => $count), WATCHDOG_INFO);
+  }
+}
+
+/**
+ * Làm sạch bảng cache.
+ */
+function _cassiopeia_db_optimize_cleanup_cache() {
+  // Làm sạch cache Drupal
+  cache_clear_all('*', 'cache', TRUE);
+  cache_clear_all('*', 'cache_block', TRUE);
+  cache_clear_all('*', 'cache_filter', TRUE);
+  cache_clear_all('*', 'cache_page', TRUE);
+  cache_clear_all('*', 'cache_menu', TRUE);
+  cache_clear_all('*', 'cache_form', TRUE);
+
+  // Làm sạch các bản ghi cache tự tạo đã hết hạn
+  db_delete('cassiopeia_query_cache')
+    ->condition('expire', REQUEST_TIME, '<')
+    ->execute();
+
+  watchdog('cassiopeia_db_optimize', 'Đã làm sạch cache', array(), WATCHDOG_INFO);
+}
+
+/**
+ * Tối ưu các bảng dữ liệu.
+ */
+function _cassiopeia_db_optimize_optimize_tables() {
+  // Danh sách các bảng cần tối ưu
+  $tables = array(
+    'tbl_backlink',
+    'tbl_backlink_detail',
+    'node',
+    'node_revision',
+    'cassiopeia_content',
+    'watchdog',
+    'cassiopeia_query_cache',
+    'cache',
+    'cache_block',
+    'cache_filter',
+    'cache_form',
+    'cache_menu',
+    'cache_page',
+  );
+
+  $count = 0;
+  foreach ($tables as $table) {
+    // Kiểm tra bảng tồn tại
+    if (db_table_exists($table)) {
+      // Tối ưu bảng
+      db_query('OPTIMIZE TABLE {' . $table . '}');
+      $count++;
+    }
+  }
+
+  watchdog('cassiopeia_db_optimize', 'Đã tối ưu @count bảng dữ liệu', array('@count' => $count), WATCHDOG_INFO);
+}
+
+/**
+ * Cache kết quả truy vấn.
+ *
+ * @param string $key
+ *   Khóa cache.
+ * @param mixed $data
+ *   Dữ liệu cần cache.
+ * @param int $expire
+ *   Thời gian hết hạn (giây).
+ */
+function cassiopeia_db_optimize_cache_set($key, $data, $expire = 3600) {
+  // Xóa cache cũ nếu có
+  db_delete('cassiopeia_query_cache')
+    ->condition('query_key', $key)
+    ->execute();
+
+  // Lưu cache mới
+  db_insert('cassiopeia_query_cache')
+    ->fields(array(
+      'query_key' => $key,
+      'data' => serialize($data),
+      'expire' => REQUEST_TIME + $expire,
+      'created' => REQUEST_TIME,
+    ))
+    ->execute();
+}
+
+/**
+ * Lấy dữ liệu từ cache.
+ *
+ * @param string $key
+ *   Khóa cache.
+ *
+ * @return mixed
+ *   Dữ liệu cache hoặc FALSE nếu không tìm thấy.
+ */
+function cassiopeia_db_optimize_cache_get($key) {
+  $cache = db_select('cassiopeia_query_cache', 'c')
+    ->fields('c', array('data', 'expire'))
+    ->condition('query_key', $key)
+    ->condition('expire', REQUEST_TIME, '>')
+    ->execute()
+    ->fetchObject();
+
+  if (!empty($cache)) {
+    return unserialize($cache->data);
+  }
+
+  return FALSE;
+}
+
+/**
+ * Helper function để tạo khóa cache từ tham số truy vấn.
+ */
+function cassiopeia_db_optimize_cache_key($prefix, $params = array()) {
+  return $prefix . ':' . md5(serialize($params));
+}
+
+/**
+ * Thực hiện truy vấn tối ưu.
+ *
+ * @param string $query
+ *   Câu truy vấn SQL.
+ * @param array $params
+ *   Tham số truy vấn.
+ * @param string $cache_prefix
+ *   Tiền tố cache.
+ * @param int $cache_lifetime
+ *   Thời gian cache.
+ *
+ * @return mixed
+ *   Kết quả truy vấn.
+ */
+function cassiopeia_db_optimize_query($query, $params = array(), $cache_prefix = NULL, $cache_lifetime = 3600) {
+  // Nếu có cache, kiểm tra cache trước
+  if ($cache_prefix) {
+    $cache_key = cassiopeia_db_optimize_cache_key($cache_prefix, array(
+      'query' => $query,
+      'params' => $params,
+    ));
+
+    $cached = cassiopeia_db_optimize_cache_get($cache_key);
+    if ($cached !== FALSE) {
+      return $cached;
+    }
+  }
+
+  // Thực hiện truy vấn
+  $result = db_query($query, $params)->fetchAll();
+
+  // Lưu vào cache nếu cần
+  if ($cache_prefix) {
+    cassiopeia_db_optimize_cache_set($cache_key, $result, $cache_lifetime);
+  }
+
+  return $result;
+}

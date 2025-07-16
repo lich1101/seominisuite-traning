@@ -1,0 +1,21 @@
+RewriteEngine on
+
+# Protect files and directories from prying eyes.
+<FilesMatch "\.(engine|inc|info|install|make|module|profile|test|po|sh|.*sql|theme|tpl(\.php)?|xtmpl)$|^(\..*|Entries.*|Repository|Root|Tag|Template)$">
+  Order allow,deny
+</FilesMatch>
+
+# Set the default handler.
+DirectoryIndex index.php index.html
+
+# Make Drupal handle any 404 errors.
+ErrorDocument 404 /index.php
+
+# Various rewrite rules.
+RewriteEngine on
+
+# Pass all requests not referring directly to files in the filesystem to index.php.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !=/favicon.ico
+RewriteRule ^ index.php [L]

@@ -1,0 +1,238 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the Cassiopeia Database Optimizer module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function cassiopeia_db_optimize_schema() {
+  $schema = array();
+
+  // Bảng lưu trữ backlink cũ
+  $schema['tbl_backlink_archive'] = array(
+    'description' => 'Bảng lưu trữ dữ liệu backlink cũ',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'ID duy nhất của backlink',
+      ),
+      'pid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'ID dự án',
+      ),
+      'url' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'URL của backlink',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Trạng thái backlink',
+      ),
+      'refer_page' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Trang nguồn của backlink',
+      ),
+      'indexed' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Trạng thái đã index',
+      ),
+      'changed' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Thời gian cập nhật',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Thời gian tạo',
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'idx_backlink_archive_pid' => array('pid'),
+      'idx_backlink_archive_status' => array('status'),
+      'idx_backlink_archive_created' => array('created'),
+      'idx_backlink_archive_changed' => array('changed'),
+    ),
+  );
+
+  // Bảng lưu trữ log cache
+  $schema['cassiopeia_query_cache'] = array(
+    'description' => 'Bảng lưu trữ cache cho các truy vấn phức tạp',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'ID duy nhất của cache',
+      ),
+      'query_key' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Khóa của truy vấn',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => FALSE,
+        'description' => 'Dữ liệu cache',
+      ),
+      'expire' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Thời gian hết hạn',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Thời gian tạo',
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'idx_query_cache_key' => array('query_key'),
+      'idx_query_cache_expire' => array('expire'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function cassiopeia_db_optimize_install() {
+  // Thêm các chỉ mục quan trọng
+  db_add_index('tbl_backlink', 'idx_backlink_pid_status', array('pid', 'status'));
+  db_add_index('tbl_backlink', 'idx_backlink_created_changed', array('created', 'changed'));
+  db_add_index('tbl_backlink_detail', 'idx_backlink_detail_pid', array('pid'));
+  db_add_index('cassiopeia_content', 'idx_content_created_changed', array('created', 'changed'));
+
+  // Lưu giá trị default cho tuần tự làm sạch dữ liệu
+  variable_set('cassiopeia_db_optimize_last_cleanup', REQUEST_TIME);
+  variable_set('cassiopeia_db_optimize_backlink_retention', 365); // Ngày giữ lại dữ liệu
+  variable_set('cassiopeia_db_optimize_watchdog_retention', 30); // Ngày giữ lại log
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function cassiopeia_db_optimize_uninstall() {
+  // Xóa các biến
+  variable_del('cassiopeia_db_optimize_last_cleanup');
+  variable_del('cassiopeia_db_optimize_backlink_retention');
+  variable_del('cassiopeia_db_optimize_watchdog_retention');
+}
+
+/**
+ * Thêm các chỉ mục quan trọng cho các bảng.
+ */
+function cassiopeia_db_optimize_update_7001() {
+  db_add_index('tbl_backlink', 'idx_backlink_pid_status', array('pid', 'status'));
+  db_add_index('tbl_backlink', 'idx_backlink_created_changed', array('created', 'changed'));
+  db_add_index('tbl_backlink_detail', 'idx_backlink_detail_pid', array('pid'));
+  db_add_index('cassiopeia_content', 'idx_content_created_changed', array('created', 'changed'));
+
+  return t('Đã thêm các chỉ mục mới cho cơ sở dữ liệu.');
+}
+
+/**
+ * Tạo bảng lưu trữ backlink cũ.
+ */
+function cassiopeia_db_optimize_update_7002() {
+  if (!db_table_exists('tbl_backlink_archive')) {
+    $schema = cassiopeia_db_optimize_schema();
+    db_create_table('tbl_backlink_archive', $schema['tbl_backlink_archive']);
+  }
+
+  return t('Đã tạo bảng lưu trữ backlink cũ.');
+}
+
+/**
+ * Tạo bảng cache truy vấn.
+ */
+function cassiopeia_db_optimize_update_7003() {
+  if (!db_table_exists('cassiopeia_query_cache')) {
+    $schema = cassiopeia_db_optimize_schema();
+    db_create_table('cassiopeia_query_cache', $schema['cassiopeia_query_cache']);
+  }
+
+  return t('Đã tạo bảng cache truy vấn.');
+}
+
+/**
+ * Di chuyển dữ liệu cũ sang bảng lưu trữ.
+ */
+function cassiopeia_db_optimize_update_7004(&$sandbox) {
+  // Thiết lập biến theo dõi tiến trình
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_id'] = 0;
+    $sandbox['max'] = db_query("SELECT COUNT(id) FROM {tbl_backlink} WHERE changed < :time",
+      array(':time' => REQUEST_TIME - 365 * 86400))->fetchField();
+  }
+
+  // Xử lý 1000 backlink mỗi lần
+  $limit = 1000;
+  $result = db_query_range("SELECT * FROM {tbl_backlink} WHERE changed < :time AND id > :id ORDER BY id ASC",
+    0, $limit, array(':time' => REQUEST_TIME - 365 * 86400, ':id' => $sandbox['current_id']))->fetchAll();
+
+  foreach ($result as $backlink) {
+    // Di chuyển vào bảng lưu trữ
+    db_insert('tbl_backlink_archive')
+      ->fields((array) $backlink)
+      ->execute();
+
+    // Xóa từ bảng chính
+    db_delete('tbl_backlink')
+      ->condition('id', $backlink->id)
+      ->execute();
+
+    $sandbox['progress']++;
+    $sandbox['current_id'] = $backlink->id;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  if ($sandbox['#finished'] >= 1) {
+    return t('Đã di chuyển @count bản ghi backlink cũ sang bảng lưu trữ.', array('@count' => $sandbox['progress']));
+  }
+}
+
+/**
+ * Cập nhật cấu hình cache Drupal.
+ */
+function cassiopeia_db_optimize_update_7005() {
+  // Bật cache
+  variable_set('cache', 1);
+  variable_set('block_cache', 1);
+  variable_set('preprocess_css', 1);
+  variable_set('preprocess_js', 1);
+  variable_set('cache_lifetime', 518400);
+  variable_set('page_cache_maximum_age', 518400);
+
+  return t('Đã cập nhật cấu hình cache.');
+}

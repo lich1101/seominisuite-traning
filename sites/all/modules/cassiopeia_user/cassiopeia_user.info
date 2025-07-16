@@ -1,0 +1,8 @@
+name = Cassiopeia user
+description = Cassiopeia user
+
+package = Cassiopeia
+core = 7.x
+version = "7.x-3.0-rc5"
+core = "7.x"
+datestamp = "1419029284"

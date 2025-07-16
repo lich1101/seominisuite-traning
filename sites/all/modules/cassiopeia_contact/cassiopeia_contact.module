@@ -1,0 +1,158 @@
+<?php
+
+function cassiopeia_contact_menu(){
+    $items = array();
+    ##contact
+    $items['lien-he'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_contact_page_callback',
+        'title' => t('Liên hệ'),
+        'access arguments' => array('access content'),
+        'file' => 'cassiopeia_contact.inc',
+    );
+    $items['admin/config/cassiopeia/contact-page'] = array(
+        'type' => MENU_NORMAL_ITEM,
+        'title' => t('Trang liên hệ'),
+        'page callback' => array('drupal_get_form'),
+        'page arguments' => array('cassiopeia_config_contact_form'),
+        'access arguments' => array('cassiopeia module'),
+        'file' => 'cassiopeia_contact.inc',
+    );
+    ##contact
+    return $items;
+}
+
+function cassiopeia_contact_form($form,&$form_state){
+    $form = array();
+    $form['contact-fullname'] = array(
+
+        '#type' => 'textfield',
+
+        '#size' => 60,
+
+        '#maxlength' => 128,
+
+//        '#required' => TRUE,
+
+        '#attributes' => array("placeholder"=>"Họ và tên",),
+        '#prefix' => "<div class='input-group-prepend'><span class=\"icon\"><i class=\"fa fa-user\"></i></span>",
+        '#suffix' => "</div>",
+        '#theme_wrappers' => array(),
+    );
+
+    $form['contact-phone'] = array(
+
+        '#type' => 'textfield',
+
+        '#size' => 60,
+
+        '#maxlength' => 128,
+
+//        '#required' => TRUE,
+
+        '#attributes' => array("placeholder"=>"Số điện thoại",),
+        '#prefix' => "<div class='input-group-prepend'><span class=\"icon\"><i class=\"fa fa-phone\"></i></span>",
+        '#suffix' => "</div>",
+        '#theme_wrappers' => array(),
+    );
+    $form['contact-address'] = array(
+
+        '#type' => 'textfield',
+
+        '#size' => 60,
+
+        '#maxlength' => 128,
+
+//        '#required' => TRUE,
+
+        '#attributes' => array("placeholder"=>"Địa chỉ",),
+        '#prefix' => "<div class='input-group-prepend'><span class=\"icon\"><i class=\"fa fa-home\"></i></span>",
+        '#suffix' => "</div>",
+        '#theme_wrappers' => array(),
+    );
+    $form['contact-mail'] = array(
+
+        '#type' => 'textfield',
+
+        '#size' => 60,
+
+        '#maxlength' => 128,
+
+//        '#required' => TRUE,
+
+        '#attributes' => array("placeholder"=>"Email",),
+        '#prefix' => "<div class='input-group-prepend'><span class=\"icon\"><i class=\"fa fa-envelope\"></i></span>",
+        '#suffix' => "</div>",
+        '#theme_wrappers' => array(),
+    );
+    $form['contact-message'] = array(
+
+        '#type' => 'textarea',
+
+        '#size' => 60,
+
+        '#maxlength' => 128,
+
+//        '#required' => TRUE,
+
+        '#attributes' => array("placeholder"=>"Nội dụng tin nhắn",),
+
+        '#theme_wrappers' => array(),
+        '#prefix' => "<div class='input-group-prepend'>",
+        '#suffix' => "</div>",
+    );
+    $form["contact-submit"] = array(
+        "#type" => "submit",
+
+        "#value" => "GỬI",
+
+        "#attributes" => array("class" => array("")),
+
+        '#prefix' => "<div class='input-group-prepend'>",
+        '#suffix' => "</div>",
+    );
+    return $form;
+}
+function cassiopeia_contact_form_submit($form,&$form_state){
+    $contact_data = array();
+    if (!empty($form_state['values']['contact-fullname']) && !(empty($form_state['values']['contact-mail'])) && !empty($form_state['values']['contact-phone']) && !empty($form_state['values']['contact-address'])) {
+        $contact_data['fullname'] = $form_state['values']['contact-fullname'];
+        $contact_data['email'] = $form_state['values']['contact-mail'];
+        $contact_data['phone'] = $form_state['values']['contact-phone'];
+        $contact_data['address'] = $form_state['values']['contact-address'];
+        if (!empty($form_state['values']['contact-message'])) {
+            $contact_data['message'] = $form_state['values']['contact-message'];
+        }else {
+            $contact_data['message'] = '';
+        }
+        $contact_data['created'] = REQUEST_TIME;
+        $contact_data['status'] = 0;
+    }
+    if (!empty($contact_data)) {
+        try {
+            $node = new stdClass();
+//            $node->title = $contact_data['full_name'];
+            $node->type = "contact";
+            $node->uid = 1;
+
+            $node->title = $contact_data['fullname'];
+            $node->field_contact_email['und'][0]['value'] = $contact_data['email'];
+            $node->field_contact_phone['und'][0]['value'] = $contact_data['phone'];
+            $node->field_contact_address['und'][0]['value'] = $contact_data['address'];
+            $node->field_contact_message['und'][0]['value'] = $contact_data['message'];
+            $node->status = 1;
+
+            $node = node_submit($node);
+            node_save($node);
+            drupal_set_message('Cảm ơn quý khách, chúng tôi sẽ liên hệ với quý khách trong thời gian sớm nhất.');
+
+        }catch ( Exception $e) {
+            drupal_set_message('Hệ thống đang bận vui lòng quay lại sau it phút.');
+            throw ($e);
+        }
+    }else {
+        drupal_set_message('Vui lòng điền đầy đủ thông tin.');
+    }
+}
+
+?>

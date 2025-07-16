@@ -1,0 +1,154 @@
+
+
+#user-profile-form .form-item-files-picture-upload {
+    height: 0px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+
+#picture-preview #picture-preview-content {
+    width: 280px;
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+
+#picture-preview {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ccc;
+    padding: 20px;
+}
+
+#edit-picture-wrapper #select-picture {
+    color: #4b4f56;
+    width: 50%;
+    height: 60px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#picture-camera-wrapper {
+    width: 50%;
+    height: 60px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#edit-picture-wrapper #select-picture button {
+    width: 200px;
+    background-color: transparent;
+    color: #4b4f56;
+    background-image: none;
+    font-family: ROBOTO-REGULAR;
+    cursor: pointer;
+    box-shadow: none;
+    border: none;
+}
+
+#picture-camera-wrapper button {
+    width: 200px;
+    background-color: transparent;
+    color: #4b4f56;
+    background-image: none;
+    font-family: ROBOTO-REGULAR;
+    cursor: pointer;
+    box-shadow: none;
+    border: none;
+}
+
+#edit-picture-wrapper .modal-body{
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 25px;
+}
+
+#edit-picture-wrapper .modal-body button.close {
+    position: absolute;
+    right: 3px;
+    top: 0px;
+}
+
+#edit-picture .user-picture img {
+    width: 100%;
+}
+
+#edit-picture .user-picture {
+    width: 287px;
+    height: 287px;
+    border: 1px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-bottom: 1px dashed #ccc !important;
+    position: relative;
+}
+
+#edit-picture .user-picture::before {
+    content: "Khéo thả";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 60px;
+    width: 160px;
+    background-color: rgba(204, 204, 204, 0.5);
+    color: rgba(255, 255, 255, 0.75);
+    font-family: ROBOTO-MEDIUM;
+    top: calc(50% - 30px);
+    left: calc(50% - 80px);
+    border-width: 1px;
+    border-style: dashed;
+    border-color: rgb(204, 204, 204);
+    border-image: initial;
+}
+#user-profile-form {
+    max-width: 600px;
+}
+#user-profile-form input[type="text"] {
+    width: 100%;
+}
+#user-profile-form .date-form-element-content-multiline {
+    padding: 0px;
+    border: none;
+}
+
+#user-profile-form .panel-default {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#user-profile-form  .panel-default > .panel-heading {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#user-profile-form  .panel-body {
+    padding: 0px;
+}
+
+#user-profile-form .panel-heading {
+    padding: 10px 0px;
+}
+
+#user-profile-form .panel-title {
+   font-weight: bold;
+    font-size: 14px;
+}
+
+#user-profile-form .panel {
+    box-shadow: none;
+}

@@ -1,0 +1,809 @@
+<?php
+
+function cassiopeia_admin_install() {
+  $path[] = 'administrator';
+  $path[] = 'admin';
+  $path[] = 'admin/*';
+  $path[] = 'manager';
+  $path[] = 'manager/*';
+  $path[] = 'user';
+  $path[] = 'user/*';
+  variable_set('admin_theme_path', implode("\n", $path));
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function cassiopeia_admin_schema() {
+  $schema['cassiopeia_admin_block'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'name' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'icon' => [
+        'type' => 'varchar',
+        'length' => '50',
+        'not null' => TRUE,
+      ],
+      'position' => [
+        'type' => 'float',
+        'size' => 'normal',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  $schema['cassiopeia_admin_items'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'bid' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'name' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'link' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'icon' => [
+        'type' => 'varchar',
+        'length' => '50',
+        'not null' => TRUE,
+      ],
+      'position' => [
+        'type' => 'float',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+        'size' => 'normal',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+  $schema['cassiopeia_wordpress_website'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'domain' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'href' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'ref_domain' => [
+        'type' => 'int',
+      ],
+      'organic_traffic' => [
+        'type' => 'int',
+      ],
+      'posted' => [
+        'type' => 'int',
+      ],
+      'posted_of_day' => [
+        'type' => 'int',
+      ],
+      'last_posted_date' => [
+        'type' => 'int',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cww_domain' => ['domain'],
+      'cww_href' => ['href'],
+      'cww_ref_domain' => ['ref_domain'],
+      'cww_organic_traffic' => ['organic_traffic'],
+      'cww_posted' => ['posted'],
+      'cww_posted_of_day' => ['posted_of_day'],
+      'cww_last_posted_date' => ['last_posted_date'],
+      'cww_uid' => ['uid'],
+      'cww_changed' => ['changed'],
+      'cww_created' => ['created'],
+    ],
+  ];
+  $schema['cassiopeia_wordpress_category'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'title' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cwc_title' => ['title'],
+      'cwc_uid' => ['uid'],
+      'cwc_changed' => ['changed'],
+      'cwc_created' => ['created'],
+    ],
+  ];
+  $schema['cassiopeia_wordpress_website_category'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'website' => [
+        'type' => 'int',
+      ],
+      'category' => [
+        'type' => 'int',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cwwc_uid' => ['uid'],
+      'cwwc_changed' => ['changed'],
+      'cwwc_created' => ['created'],
+    ],
+  ];
+
+  $schema['cassiopeia_content'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'pid' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'title' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'raw_title' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'body' => [
+        'type' => 'blob',
+        'size' => 'normal', // normal / big
+        'not null' => FALSE,
+      ],
+      'word_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'h2_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'h3_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'image_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'point' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'keyword' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cc_pid' => ['pid'],
+      'cc_title' => ['title'],
+      'cc_word_count' => ['word_count'],
+      'cc_h2_count' => ['h2_count'],
+      'cc_h3_count' => ['h3_count'],
+      'cc_image_count' => ['image_count'],
+      'cc_point' => ['point'],
+      'cc_uid' => ['uid'],
+      'cc_changed' => ['changed'],
+      'cc_created' => ['created'],
+    ],
+  ];
+
+  $schema['cassiopeia_content_check'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'data' => [
+        'type' => 'blob',
+        'size' => 'normal', // normal / big
+        'not null' => FALSE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'google_index' => [
+        'type' => 'int',
+      ],
+      'nid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cc_uid' => ['uid'],
+    ],
+  ];
+  $schema['cassiopeia_backlink_tel'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'bid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'default' => 0,
+      ],
+      'tel' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cbt_uid' => ['uid'],
+      'cbt_bid' => ['bid'],
+      'cbt_tel' => ['tel'],
+      'cbt_created' => ['created'],
+    ],
+  ];
+  return $schema;
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function cassiopeia_admin_uninstall() {
+  drupal_uninstall_schema('cassiopeia_admin_block');
+  drupal_uninstall_schema('cassiopeia_admin_items');
+}
+
+
+function cassiopeia_admin_update_7128() {
+  $schema['cassiopeia_content'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'pid' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'title' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'body' => [
+        'type' => 'blob',
+        'size' => 'normal', // normal / big
+        'not null' => FALSE,
+      ],
+      'word_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'h2_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'h3_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'image_count' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'point' => [
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cc_pid' => ['pid'],
+      'cc_title' => ['title'],
+      'cc_word_count' => ['word_count'],
+      'cc_h2_count' => ['h2_count'],
+      'cc_h3_count' => ['h3_count'],
+      'cc_image_count' => ['image_count'],
+      'cc_point' => ['point'],
+      'cc_uid' => ['uid'],
+      'cc_changed' => ['changed'],
+      'cc_created' => ['created'],
+    ],
+  ];
+  db_create_table('cassiopeia_content', $schema['cassiopeia_content']);
+
+}
+
+function cassiopeia_admin_update_7129() {
+  $schema['cassiopeia_content_check'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+
+      'data' => [
+        'type' => 'blob',
+        'size' => 'normal', // normal / big
+        'not null' => FALSE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cc_uid' => ['uid'],
+    ],
+  ];
+  db_create_table('cassiopeia_content_check', $schema['cassiopeia_content_check']);
+
+}
+
+function cassiopeia_admin_update_7130() {
+  $field = [
+    'type' => 'int',
+    'unsigned' => TRUE,
+  ];
+  db_add_field('cassiopeia_content_check', 'index', $field);
+}
+
+function cassiopeia_admin_update_7131() {
+  $field = [
+    'type' => 'int',
+  ];
+  db_add_field('cassiopeia_content_check', 'google_index', $field);
+}
+
+function cassiopeia_admin_update_7132() {
+  $field = [
+    'type' => 'int',
+    'size' => 'big',
+    'default' => 0,
+  ];
+  db_add_field('cassiopeia_content_check', 'nid', $field);
+  $keyword = [
+    'type' => 'varchar',
+    'length' => '255',
+  ];
+  db_add_field('cassiopeia_content', 'keyword', $keyword);
+}
+
+function cassiopeia_admin_update_7133() {
+
+}
+
+function cassiopeia_admin_update_7134() {
+  $schema['cassiopeia_order_content'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'title' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'raw_title' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'website' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'raw_website' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'price' => [
+        'type' => 'float',
+      ],
+      'discount' => [
+        'type' => 'float',
+      ],
+      'tel' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'email' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'coc_title' => ['title'],
+      'coc_raw_title' => ['raw_title'],
+      'coc_website' => ['website'],
+      'coc_raw_website' => ['raw_website'],
+      'coc_uid' => ['uid'],
+      'coc_changed' => ['changed'],
+      'coc_created' => ['created'],
+    ],
+  ];
+  db_create_table('cassiopeia_order_content', $schema['cassiopeia_order_content']);
+
+}
+
+function cassiopeia_admin_update_7135() {
+  $field = [
+    'type' => 'float',
+  ];
+  db_add_field('cassiopeia_order_content', 'promotion_price', $field);
+}
+
+function cassiopeia_admin_update_7136() {
+  $schema['cassiopeia_wordpress_website'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'domain' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'href' => [
+        'type' => 'varchar',
+        'length' => '255',
+      ],
+      'ref_domain' => [
+        'type' => 'int',
+      ],
+      'organic_traffic' => [
+        'type' => 'int',
+      ],
+      'posted' => [
+        'type' => 'int',
+      ],
+      'posted_of_day' => [
+        'type' => 'int',
+      ],
+      'last_posted_date' => [
+        'type' => 'int',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cww_domain' => ['domain'],
+      'cww_href' => ['href'],
+      'cww_ref_domain' => ['ref_domain'],
+      'cww_organic_traffic' => ['organic_traffic'],
+      'cww_posted' => ['posted'],
+      'cww_posted_of_day' => ['posted_of_day'],
+      'cww_last_posted_date' => ['last_posted_date'],
+      'cww_uid' => ['uid'],
+      'cww_changed' => ['changed'],
+      'cww_created' => ['created'],
+    ],
+  ];
+  $schema['cassiopeia_wordpress_category'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'title' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cwc_title' => ['title'],
+      'cwc_uid' => ['uid'],
+      'cwc_changed' => ['changed'],
+      'cwc_created' => ['created'],
+    ],
+  ];
+  $schema['cassiopeia_wordpress_website_category'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'website' => [
+        'type' => 'int',
+      ],
+      'category' => [
+        'type' => 'int',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'description' => 'The Unix timestamp when the trademark was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'description' => 'The Unix timestamp when the trademark was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cwwc_uid' => ['uid'],
+      'cwwc_changed' => ['changed'],
+      'cwwc_created' => ['created'],
+    ],
+  ];
+  db_create_table('cassiopeia_wordpress_website', $schema['cassiopeia_wordpress_website']);
+  db_create_table('cassiopeia_wordpress_category', $schema['cassiopeia_wordpress_category']);
+  db_create_table('cassiopeia_wordpress_website_category', $schema['cassiopeia_wordpress_website_category']);
+}
+function cassiopeia_admin_update_7137() {
+  $schema['cassiopeia_backlink_tel'] = [
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'bid' => [
+        'type' => 'int',
+        'size' => 'big',
+        'default' => 0,
+      ],
+      'tel' => [
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'cbt_uid' => ['uid'],
+      'cbt_bid' => ['bid'],
+      'cbt_tel' => ['tel'],
+      'cbt_created' => ['created'],
+    ],
+  ];
+  db_create_table('cassiopeia_backlink_tel', $schema['cassiopeia_backlink_tel']);
+}

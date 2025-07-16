@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Module cho phép làm trắng dữ liệu trong cơ sở dữ liệu.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function cassiopeia_cleanup_permission() {
+  return array(
+    'administer cassiopeia cleanup' => array(
+      'title' => t('Quản lý làm trắng dữ liệu'),
+      'description' => t('Cho phép người dùng làm trắng dữ liệu. NGUY HIỂM, chỉ cấp cho admin.'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function cassiopeia_cleanup_menu() {
+  $items = array();
+
+  $items['admin/config/cassiopeia/cleanup'] = array(
+    'title' => 'Làm trắng dữ liệu',
+    'description' => 'Làm trắng dữ liệu trong cơ sở dữ liệu.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cassiopeia_cleanup_form'),
+    'access arguments' => array('administer cassiopeia cleanup'),
+    'file' => 'cassiopeia_cleanup.admin.inc',
+  );
+
+  // Thêm đường dẫn trực tiếp trong trường hợp module không hiển thị
+  $items['database-cleanup'] = array(
+    'title' => 'Công cụ làm trắng dữ liệu',
+    'description' => 'Truy cập trực tiếp đến công cụ làm trắng dữ liệu.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cassiopeia_cleanup_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'cassiopeia_cleanup.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_help().
+ */
+function cassiopeia_cleanup_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/cassiopeia/cleanup':
+    case 'database-cleanup':
+      return '<p>' . t('CẢNH BÁO: Công cụ này sẽ xóa dữ liệu. Hãy đảm bảo bạn đã sao lưu cơ sở dữ liệu trước khi tiếp tục.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_init().
+ */
+function cassiopeia_cleanup_init() {
+  // Hiển thị thông báo cho admin biết về công cụ này
+  global $user;
+  if (user_access('administer site configuration') && current_path() == 'admin/modules') {
+    drupal_set_message(t('Module "Cassiopeia Cleanup" đã được cài đặt. Bạn có thể truy cập trực tiếp tại: <a href="@url">@url</a>',
+      array('@url' => url('database-cleanup'))), 'status');
+  }
+}

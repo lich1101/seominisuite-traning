@@ -1,0 +1,384 @@
+<?php
+
+define('AD_VTQC', 'tx_cassiopeia_adv_position');
+
+function cassiopeia_adv_init()
+{
+	global $theme_key;
+	drupal_add_library('system', 'jquery.cookie', true);
+	if ($theme_key == 'custom_theme') {
+		drupal_add_css(drupal_get_path('module', 'cassiopeia_adv') . '/cassiopeia_adv.css', array('weight' => 5));
+		drupal_add_js(drupal_get_path('module', 'cassiopeia_adv') . '/cassiopeia_adv.js', array('weight' => 5));
+	}
+}
+
+/**
+ * Implementation of hook_node_presave
+ *
+ */
+function cassiopeia_adv_node_presave($node)
+{
+	if ($node->type == 'cassiopeia_adv') {
+		$pos = array(
+			'field_node_type' => $node->field_node_type,
+			'field_voc_type' => $node->field_voc_type,
+			'field_path_pos' => $node->field_path_pos,
+			'field_show' => $node->field_show,
+			'requried_all' => $node->requried_all,
+			'path_front' => $node->path_front,
+			'path_all' => $node->path_all,
+		);
+		$pos_ex = array(
+			'field_node_type_exclude' => $node->field_node_type_exclude,
+			'field_voc_type_exclude' => $node->field_voc_type_exclude,
+			'field_path_pos_exclude' => $node->field_path_pos_exclude,
+			'requried_all_exclude' => $node->requried_all_exclude,
+			'path_front_exclude' => $node->path_front_exclude,
+			'path_all_exclude' => $node->path_all_exclude,
+		);
+		$node->field_c_adv_setting['und'][0]['value'] = serialize($pos);
+		$node->field_c_adv_exclude_setting['und'][0]['value'] = serialize($pos_ex);
+	}
+}
+
+/**
+ * Implemetation of hook_form_alter
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @param unknown_type $form_id
+ */
+function cassiopeia_adv_form_alter(&$form, &$form_state, $form_id)
+{
+	if ($form_id == 'cassiopeia_adv_node_form') {
+		$node = $form['#node'];
+		$form['field_c_adv_setting']['#access'] = false;
+		$form['field_c_adv_exclude_setting']['#access'] = false;
+		$pos = array();
+		$pos_ex = array();
+		if (isset($node->nid) && $node->nid) {
+			if (isset($node->field_c_adv_setting['und'][0]['value']))
+				$pos = unserialize($node->field_c_adv_setting['und'][0]['value']);
+			if (isset($node->field_c_adv_exclude_setting['und'][0]['value']))
+				$pos_ex = unserialize($node->field_c_adv_exclude_setting['und'][0]['value']);
+		}
+		$form['slide_position'] = array(
+			'#type' => 'fieldset',
+			'#title' => 'Trang hiển thị',
+			'#weight' => 3,
+			'#collapsible' => TRUE,
+			'#collapsed' => FALSE,
+		);
+		$form['slide_position_exclude'] = array(
+			'#type' => 'fieldset',
+			'#title' => 'Trang không hiển thị',
+			'#weight' => 4,
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
+		);
+		
+		$form['slide_position']['path_front'] = array(
+			'#type' => 'checkbox',
+			'#title' => 'Trang chủ',
+			'#default_value' => isset($pos['path_front']) ? $pos['path_front'] : '',
+		);
+		$form['slide_position_exclude']['path_front_exclude'] = array(
+			'#type' => 'checkbox',
+			'#title' => 'Trang chủ',
+			'#default_value' => isset($pos_ex['path_front_exclude']) ? $pos_ex['path_front_exclude'] : '',
+		);
+		$form['slide_position']['path_all'] = array(
+			'#type' => 'checkbox',
+			'#title' => 'Tất cả các trang',
+			'#default_value' => isset($pos['path_all']) ? $pos['path_all'] : '',
+		);
+		$form['slide_position_exclude']['path_all_exclude'] = array(
+			'#type' => 'checkbox',
+			'#title' => 'Tất cả các trang',
+			'#default_value' => isset($pos_ex['path_all_exclude']) ? $pos_ex['path_all_exclude'] : '',
+		);
+		//node
+		$types = node_type_get_types();
+		foreach ($types as $key => $type) {
+			$list_ndoe[$key] = $type->name;
+		}
+		unset($list_ndoe['cassiopeia_adv']);
+		
+		$form['slide_position']['field_node_type'] = array(
+			'#type' => 'select',
+			'#title' => 'Chi tiết trang',
+			'#options' => $list_ndoe,
+			'#multiple' => true,
+			'#default_value' => isset($pos['field_node_type']) ? $pos['field_node_type'] : '',
+			'#size' => 5,
+			'#chosen' => true
+		);
+		$form['slide_position_exclude']['field_node_type_exclude'] = array(
+			'#type' => 'select',
+			'#title' => 'Chi tiết trang',
+			'#options' => $list_ndoe,
+			'#multiple' => true,
+			'#default_value' => isset($pos_ex['field_node_type_exclude']) ? $pos_ex['field_node_type_exclude'] : '',
+			'#size' => 5,
+			'#chosen' => true
+		);
+		//taxonomy
+		$list_voc = array();
+		$arr_voc = array(
+			//            todo
+			'tags',
+		);
+		foreach ($arr_voc as $voc_name) {
+			$vocabulary = taxonomy_vocabulary_machine_name_load($voc_name);
+			if ($terms = taxonomy_get_tree($vocabulary->vid)) {
+				foreach ($terms as $term) {
+					$list_voc[$vocabulary->name][$term->tid] = str_repeat('-', $term->depth) . $term->name;
+				}
+			}
+		}
+		$form['slide_position']['field_voc_type'] = array(
+			'#type' => 'select',
+			'#title' => 'Danh mục',
+			'#options' => $list_voc,
+			'#multiple' => true,
+			'#default_value' => isset($pos['field_voc_type']) ? $pos['field_voc_type'] : '',
+			'#size' => 10,
+			'#chosen' => true
+		);
+		$form['slide_position_exclude']['field_voc_type_exclude'] = array(
+			'#type' => 'select',
+			'#title' => 'Danh mục',
+			'#options' => $list_voc,
+			'#multiple' => true,
+			'#default_value' => isset($pos_ex['field_voc_type_exclude']) ? $pos_ex['field_voc_type_exclude'] : '',
+			'#size' => 6,
+			'#chosen' => true
+		);
+		//
+		$form['slide_position']['requried_all'] = array(
+			'#type' => 'checkbox',
+			'#title' => 'Kết hợp giữa Chi tiết trang và danh mục',
+			'#default_value' => isset($pos['requried_all']) ? $pos['requried_all'] : '',
+		);
+		$form['slide_position_exclude']['requried_all_exclude'] = array(
+			'#type' => 'checkbox',
+			'#title' => 'Kết hợp giữa Chi tiết trang và danh mục',
+			'#default_value' => isset($pos_ex['requried_all_exclude']) ? $pos_ex['requried_all_exclude'] : '',
+		);
+		//
+		$form['slide_position']['field_path_pos'] = array(
+			'#type' => 'textarea',
+			'#title' => 'Đương dẫn',
+			'#rows' => 3,
+			'#description' => 'Mỗi đường dẫn trên một dòng, &lt;all&gt; là tất cả, &lt;front&gt; là trang chủ',
+			'#default_value' => isset($pos['field_path_pos']) ? $pos['field_path_pos'] : '',
+		);
+		$form['slide_position_exclude']['field_path_pos_exclude'] = array(
+			'#type' => 'textarea',
+			'#title' => 'Đương dẫn',
+			'#rows' => 3,
+			'#description' => 'Mỗi đường dẫn trên một dòng, &lt;all&gt; là tất cả, &lt;front&gt; là trang chủ',
+			'#default_value' => isset($pos_ex['field_path_pos_exclude']) ? $pos_ex['field_path_pos_exclude'] : '',
+		);
+		//kieu
+		$form['field_show'] = array(
+			'#type' => 'select',
+			'#title' => 'Kiểu hiển thị',
+			'#options' => array(
+				//                0 => 'Mặc định',
+				//                2 => 'Nivo slider',
+				3 => 'Swiper slider'
+			),
+			'#default_value' => isset($pos['field_show']) ? $pos['field_show'] : '',
+		);
+		$form['actions']['submit']['#submit'][] = '_cassiopeia_adv_node_ad_form_submit';
+	}
+}
+
+function _cassiopeia_adv_node_ad_form_submit($form, &$form_state)
+{
+	$form_state['redirect'] = 'node/add/ctype-adv';
+}
+
+function cassiopeia_adv_view_adv($tid = 1) {
+	global  $language;
+	global $node_cassiopeia_adv;
+	
+	if (empty($node_cassiopeia_adv)) {
+		$node_cassiopeia_adv = node_load_multiple(array(), array('type' => 'cassiopeia_adv', 'status' => 1));
+	}
+	$out = '';
+	$nodes = $node_cassiopeia_adv;
+	$field_danh_muc_node = array(
+		'Bài viết' => 'tx_article',
+	);
+	$arg = arg();
+	
+	foreach ($nodes as $node) {
+		if (!empty($node->field_c_adv_position['und'][0]['tid']) && $node->field_c_adv_position['und'][0]['tid'] == $tid && $node->language == $language->language) {
+			$show_1 = false;
+			if (empty($node->field_c_adv_setting['und'][0]['value'])) continue;
+			$pos = unserialize($node->field_c_adv_setting['und'][0]['value']);
+			$pos_ex = array();
+			if (!empty($node->field_c_adv_exclude_setting['und'][0]['value'])) {
+				$pos_ex = unserialize($node->field_c_adv_exclude_setting['und'][0]['value']);
+			}
+			
+			
+			if ((!empty($pos['path_all']) && $pos['path_all']) || (!empty($pos['path_front']) && $pos['path_front'] && drupal_is_front_page())) {
+				$show_1 = true;
+			}
+			if (!$show_1) {
+				if (empty($pos['requried_all'])){ $pos['requried_all'] = 0;}
+				if ($pos['requried_all']) {
+					if (!empty($pos['field_node_type']) && !empty($pos['field_voc_type'])) {
+						if (count($arg) == 2 && $arg[0] == 'node' && is_numeric($arg[1])) {
+							$cnode = node_load($arg[1]);
+							$voc_type = $pos['field_voc_type'];
+							$node_type = $pos['field_node_type'];
+							if (in_array($cnode->type, array_keys($node_type))) {
+								foreach ($voc_type as $key1 => $value) {
+									if (!empty($field_danh_muc_node[$cnode->type]) && !empty($cnode->{$field_danh_muc_node[$cnode->type]}['und'])) {
+										foreach ($cnode->{$field_danh_muc_node[$cnode->type]}['und'] as $item) {
+											if ($key1 == $item['tid']) {
+												$show_1 = true;
+												break;
+											}
+										}
+									}
+								}
+							}
+							
+						}
+					}
+				} else {
+					
+					if (!empty($pos['field_node_type'])) {
+						if (count($arg) == 2 && $arg[0] == 'node' && is_numeric($arg[1])) {
+							$cnode = node_load($arg[1]);
+							$node_type = $pos['field_node_type'];
+							if (in_array($cnode->type, array_keys($node_type))) {$show_1 = true;}
+						}
+					}
+					if (!$show_1 && !empty($pos['field_voc_type'])) {
+						if (count($arg) == 3 && $arg[0] == 'taxonomy' && $arg[1] == 'term') {
+							$cterm = taxonomy_term_load($arg[2]);
+							$voc_type = $pos['field_voc_type'];
+							if (in_array($cterm->tid, array_keys($voc_type))) {$show_1 = true;}
+						}
+					}
+				}
+				
+				if (!empty($pos['field_path_pos'])) {
+					$_field_path_pos = explode(PHP_EOL,$pos['field_path_pos']);
+					if (!empty($_field_path_pos) && in_array($arg[0],$_field_path_pos)) {
+						$show_1 = TRUE;
+					}
+				}
+			}
+			//check hide
+			if ($show_1) {
+				if ((!empty($pos_ex['path_all_exclude']) && $pos_ex['path_all_exclude']) || (!empty($pos_ex['path_front_exclude']) && $pos_ex['path_front_exclude'] && drupal_is_front_page())) {
+					$show_1 = false;
+				}
+				if ($show_1) {
+					if (empty($pos_ex['requried_all_exclude'])) $pos_ex['requried_all_exclude'] = 0;
+					if ($pos_ex['requried_all_exclude']) {
+						if (!empty($pos_ex['field_node_type_exclude']) && !empty($pos_ex['field_voc_type_exclude'])) {
+							if (count($arg) == 2 && $arg[0] == 'node' && is_numeric($arg[1])) {
+								$cnode = node_load($arg[1]);
+								$voc_type = $pos_ex['field_voc_type_exclude'];
+								$node_type = $pos_ex['field_node_type_exclude'];
+								if (in_array($cnode->type, array_keys($node_type))) {
+									foreach ($voc_type as $key1 => $value) {
+										if (!empty($field_danh_muc_node[$cnode->type]) && !empty($cnode->{$field_danh_muc_node[$cnode->type]}['und'])) {
+											foreach ($cnode->{$field_danh_muc_node[$cnode->type]}['und'] as $item) {
+												if ($key1 == $item['tid']) {
+													$show_1 = false;
+													break;
+												}
+											}
+										}
+									}
+								}
+								
+							}
+						}
+					} else {
+						if (!empty($pos_ex['field_node_type_exclude'])) {
+							if (count($arg) == 2 && $arg[0] == 'node' && is_numeric($arg[1])) {
+								$cnode = node_load($arg[1]);
+								$node_type = $pos_ex['field_node_type_exclude'];
+								if (in_array($cnode->type, array_keys($node_type))) $show_1 = false;
+							}
+						}
+						if ($show_1 && !empty($pos_ex['field_voc_type_exclude'])) {
+							if (count($arg) == 3 && $arg[0] == 'taxonomy' && $arg[1] == 'term') {
+								$cterm = taxonomy_term_load($arg[2]);
+								$voc_type = $pos_ex['field_voc_type_exclude'];
+								if (in_array($cterm->tid, array_keys($voc_type))) $show_1 = false;
+							}
+						}
+					}
+					
+					if (!empty($pos_ex['field_path_pos_exclude'])) {
+						$_field_path_pos_exclude = explode(PHP_EOL,$pos_ex['field_path_pos_exclude']);
+						if (!empty($_field_path_pos_exclude) && in_array($arg[0],$_field_path_pos_exclude)) {
+							$show_1 = FALSE;
+						}
+					}
+				}
+			}
+			if ($show_1) {
+				if (!empty($node->field_c_adv_images['und']) || !empty($node->field_flash['und'])) {
+					if (!empty($node->field_c_adv_images['und'])) {
+						$out .= theme('cassiopeia_adv_show_image', array('node' => $node));
+					}
+					if (!empty($node->field_c_adv_html_code['und'])) {
+						foreach ($node->field_c_adv_html_code['und'] as $key => $item) {
+							if ($pos['field_show'] == 2) {
+								$out .= '<div id="html-caption-' . $node->nid . '-' . $key . '" class="nivo-html-caption"><div class="container">' . $item['value'] . '</div></div>';
+							} elseif ($pos['field_show'] != 3) {
+								$out .= '<div class="ad-html">' . $item['value'] . '</div>';
+							}
+						}
+					}
+				} elseif (!empty($node->field_c_adv_html_code['und'])) {
+					if ($pos['field_show'] != 3) {
+						foreach ($node->field_c_adv_html_code['und'] as $item) {
+							$out .= '<div class="ad-html">' . $item['value'] . '</div>';
+						}
+					}
+				}
+			}
+		}
+	}
+	if ($out)
+		return '<div id="slide-content-' . $tid . '">' . $out . '</div>';
+	return '';
+}
+
+/**
+ * Implementation of hook_theme
+ *
+ * @param unknown_type $existing
+ * @param unknown_type $type
+ * @param unknown_type $theme
+ * @param unknown_type $path
+ * @return unknown
+ */
+function cassiopeia_adv_theme($existing, $type, $theme, $path)
+{
+	$themes['cassiopeia_adv_show_image'] = array(
+		'variables' => array('node' => NULL),
+		'file' => 'cassiopeia_adv.theme.inc'
+	);
+	$themes['cassiopeia_adv_show_flash'] = array(
+		'variables' => array('node' => NULL),
+		'file' => 'cassiopeia_adv.theme.inc'
+	);
+	return $themes;
+}
+
+
+

@@ -1,0 +1,320 @@
+<?php
+
+//Link call model dialog from other page.
+//ctools_include('modal');
+//ctools_modal_add_js();
+//print(l('Get dialog form', 'cassiopeia/entities/3/edit/nojs', array('attributes' => array('class' => 'ctools-use-modal'))));
+//
+
+function cassiopeia_dialog_menu()
+{
+  $items = array();
+  $items['order/content/add/%ctools_js'] = array(
+    'page callback' => 'cassiopeia_dialog_order_content_add_ajax_callback',
+    'page arguments' => array(3),
+      'access callback' => 'cassiopeia_user_accept',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/manager/guest-post/domain/change/booking/%cassiopeia_guest_post_domain_change_booking/edit/%ctools_js'] = array(
+    'page callback' => 'cassiopeia_dialog_domain_change_booking_edit_ajax_callback',
+    'page arguments' => array(6,8),
+    'access arguments' => array('cassiopeia module'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/manager/captcha/resolve/booking/%cassiopeia_captcha_resolve_booking/edit/%ctools_js'] = array(
+    'page callback' => 'cassiopeia_dialog_captcha_resolve_booking_edit_ajax_callback',
+    'page arguments' => array(5,7),
+    'access arguments' => array('cassiopeia module'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['guest-post/domain/change/form/%ctools_js'] = array(
+    'page callback' => 'cassiopeia_dialog_domain_change_ajax_callback',
+    'page arguments' => array(4),
+      'access callback' => 'cassiopeia_user_accept',
+    'type' => MENU_CALLBACK,
+  );
+    $items['admin/manager/guest-post/complain/%cassiopeia_guest_post_complain/edit/%ctools_js'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_dialog_complain_edit_ajax_callback',
+        'page arguments' => array(4,6),
+        'title' => t('Cập nhật khiếu nại'),
+        'access arguments' => array('cassiopeia module'),
+    );
+    $items['admin/manager/guest-post/order-content/%cassiopeia_guest_post_order_content/edit/%ctools_js'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_dialog_order_content_edit_ajax_callback',
+        'page arguments' => array(4,6),
+        'title' => t('Cập nhật tình trạng'),
+        'access arguments' => array('cassiopeia module'),
+    );
+    $items['guest-post/article/pre-save/%ctools_js'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_dialog_article_pre_save_ajax_callback',
+        'page arguments' => array(3),
+        'title' => t(''),
+        'access callback' => 'cassiopeia_user_accept',
+    );
+    $items['guest-post/article/tag/%ctools_js'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_dialog_article_tag_manager_ajax_callback',
+        'page arguments' => array(3),
+        'title' => t(''),
+        'access callback' => 'cassiopeia_user_accept',
+    );
+    return $items;
+}
+
+/**
+ * Ajax menu callback.
+ */
+
+
+function cassiopeia_dialog_order_content_add_ajax_callback ($ajax) {
+  drupal_set_title('Đăng ký trở thành CTV viết content');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+//    _print_r($ajax);
+//    die;
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array();
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_guest_post_order_content_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_guest_post_order_content_form');
+  }
+}
+function cassiopeia_dialog_captcha_resolve_booking_edit_ajax_callback ($booking,$ajax) {
+  drupal_set_title('Cập nhật đơn hàng');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array(array("booking"=>$booking));
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_captcha_resolve_booking_edit_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_captcha_resolve_booking_edit_form',array(array("booking"=>$booking)));
+  }
+}
+function cassiopeia_dialog_domain_change_booking_edit_ajax_callback ($booking,$ajax) {
+  drupal_set_title('Cập nhật đơn hàng');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array(array("booking"=>$booking));
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_guest_post_domain_change_booking_edit_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_guest_post_domain_change_booking_edit_form',array(array("booking"=>$booking)));
+  }
+}
+function cassiopeia_dialog_domain_change_ajax_callback ($ajax) {
+  drupal_set_title('Upload file excel');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array();
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_guest_post_domain_change_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_guest_post_domain_change_form',array());
+  }
+}
+function cassiopeia_dialog_complain_edit_ajax_callback ($complain,$ajax) {
+  drupal_set_title('Cập nhật khiếu nại');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array(array("complain"=>$complain));
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_guest_post_complain_edit_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_guest_post_domain_change_form',array(array("complain"=>$complain)));
+  }
+}
+function cassiopeia_dialog_order_content_edit_ajax_callback ($node,$ajax) {
+  drupal_set_title('Cập nhật tình trạng');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array(array("node"=>$node));
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_guest_post_order_content_edit_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_guest_post_order_content_edit_form',array(array("node"=>$node)));
+  }
+}
+function cassiopeia_dialog_article_pre_save_ajax_callback ($ajax) {
+  drupal_set_title('');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array();
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_guest_post_article_pre_save_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_guest_post_article_pre_save_form',array());
+  }
+}
+function cassiopeia_dialog_article_tag_manager_ajax_callback ($ajax) {
+  drupal_set_title('Quản lý tag');
+//  $lawyer = (object)cassiopeia_lawyer_lawyer_new();
+
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+    );
+    $form_state['build_info']['args'] = array();
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+
+    $output = ctools_modal_form_wrapper('cassiopeia_guest_post_article_tag_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output =     $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  } else {
+    $lawyer = array();
+    return drupal_get_form('cassiopeia_guest_post_article_tag_form',array());
+  }
+}

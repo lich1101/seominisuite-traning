@@ -1,0 +1,129 @@
+/* Cassiopeia theme core */
+
+@font-face {
+    font-family: UTM_AVO;
+    src: url('../font/UTM_AVO.TTF');
+}
+
+@font-face {
+    font-family: UTM_AVO_BOLD;
+    src: url('../font/UTM_AVO_BOLD.TTF');
+}
+
+@font-face {
+    font-family: UTM_AVO_BOLD_ITALIC;
+    src: url('../font/UTM_AVO_BOLD_ITALIC.TTF');
+}
+
+@font-face {
+    font-family: UTM_AVO_ITALIC;
+    src: url('../font/UTM_AVO_ITALIC.TTF');
+}
+
+img {
+    max-width: 100%;
+}
+
+body {
+    font-family: "UTM_AVO", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.w-15 {
+    width: 15% !important;
+}
+
+.w-45 {
+    width: 45% !important;
+}
+
+.mb-0 {
+    margin: 0px !important;
+}
+
+.defaultSkin .mceMenu .mceText {
+    background-color: white !important;
+}
+
+.col-md-padding-10 {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.col-md-padding-10 {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.col-md-padding-0 {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.margin--10 {
+    margin-right: -10px;
+    margin-left: -10px;
+}
+
+.margin-0 {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.margin-15 {
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+.col-md-padding-left-0 {
+    padding-left: 0px;
+}
+
+.col-md-padding-right-0 {
+    padding-right: 0px;
+}
+
+.col-md-padding-left-28 {
+    padding-left: 28px;
+}
+
+.col-md-padding-right-28 {
+    padding-right: 28px;
+}
+
+.padding-0 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.padding-60 {
+    padding-left: 60px;
+    padding-right: 60px;
+}
+
+.margin-auto {
+    margin: auto;
+}
+
+.tabs .nav-tabs {
+    margin-bottom: 0px;
+}
+
+.page-keywords .table-type-2>tbody>tr>td>a {
+    -webkit-line-clamp: 1;
+}
+
+.bg-white {
+    background-color: #fff;
+}
+
+.pd-15 {
+    padding: 15px;
+}
+
+.br-5 {
+    border-radius: 5px;
+}
+
+.bsd-black {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, .16);
+}

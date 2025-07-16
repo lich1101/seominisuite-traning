@@ -1,0 +1,55 @@
+<?php
+function cassiopeia_contact_schema(){
+    try{
+    $schema['tbl_contact'] = array(
+            'description' => 'The table for storing the products data.',
+            'fields' => array(
+                'contact_id' => array(
+                    'description' => 'The primary identifier for product.',
+                    'type' => 'serial',
+                    'not null' => TRUE,
+                    'unsigned' => TRUE,
+                ),
+                'contact_name' => array(
+                    'type' => 'varchar',
+                    'length' => 255,
+                    'not null' => TRUE,
+                    'default' => '',
+                ),
+                'contact_mail' => array(
+                    'type' => 'varchar',
+                    'length' => 255,
+                    'not null' => TRUE,
+                    'default' => '',
+                ),
+                'contact_tel' => array(
+                    'type' => 'varchar',
+                    'length' => 255,
+                    'not null' => TRUE,
+                    'default' => '',
+                ),
+                'contact_address' => array(
+                    'type' => 'varchar',
+                    'length' => 255,
+                    'not null' => TRUE,
+                    'default' => '',
+                ),
+                'contact_content' => array(
+                    'type' => 'varchar',
+                    'length' => 255,
+                    'not null' => TRUE,
+                    'default' => '',
+                ),
+                'contact_created' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                   'unsigned' => TRUE,
+                ),
+            ),
+            'primary key' => array('contact_id'),
+        );
+        return $schema;
+    }catch(Exception $e){
+        print_r($e);
+    }
+}

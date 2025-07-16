@@ -1,0 +1,373 @@
+<?php
+
+function cassiopeia_captcha_install() {
+
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function cassiopeia_captcha_schema() {
+    $schema['cassiopeia_captcha_resolve_booking_price'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            // số lượt giải captcha
+            'quantity'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+                'not null' => TRUE,
+                'default' => 1
+            ),
+            // giá
+            'price'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+                'not null' => TRUE,
+                'default' => 100000
+            ),
+            // độ nặng
+            'weight'=>array(
+                'type' => 'int',
+                'default' => 0
+            ),
+            // % giảm giá
+            'percent'=>array(
+                'type' => 'float',
+                'default' => 0
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'quantity' => array('quantity'),
+            'price' => array('price'),
+            'weight' => array('weight'),
+            'uid' => array('uid'),
+            'changed' => array('changed'),
+            'created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_captcha_resolve'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            // tổng số
+            'total'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            // đã sử dụng
+            'used'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            // còn lại
+            'remaining'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'total' => array('total'),
+            'used' => array('used'),
+            'remaining' => array('remaining'),
+            'uid' => array('uid'),
+            'changed' => array('changed'),
+            'created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_captcha_resolve_booking'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            // mã đơn)
+            'booking_code'=>array(
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            // số lượng
+            'quantity'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            // tổng tiền
+            'total_price'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            // tình trạng 0 đang chờ, 1 hoàn thành, 2 hủy
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+            ),
+            // uid người duyệt
+            'tran_user'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            // người tạo
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'booking_code' => array('booking_code'),
+            'quantity' => array('quantity'),
+            'total_price' => array('total_price'),
+            'status' => array('status'),
+            'tran_user' => array('tran_user'),
+            'uid' => array('uid'),
+            'changed' => array('changed'),
+            'created' => array('created'),
+        ),
+    );
+    return $schema;
+}
+function cassiopeia_captcha_update_7101() {
+    if(!db_table_exists("cassiopeia_captcha_resolve_booking_price")){
+        $schema['cassiopeia_captcha_resolve_booking_price'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                // số lượt giải captcha
+                'quantity'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                    'not null' => TRUE,
+                    'default' => 1
+                ),
+                // giá
+                'price'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                    'not null' => TRUE,
+                    'default' => 100000
+                ),
+                // độ nặng
+                'weight'=>array(
+                    'type' => 'int',
+                    'default' => 0
+                ),
+                // % giảm giá
+                'percent'=>array(
+                    'type' => 'float',
+                    'default' => 0
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'quantity' => array('quantity'),
+                'price' => array('price'),
+                'weight' => array('weight'),
+                'uid' => array('uid'),
+                'changed' => array('changed'),
+                'created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_captcha_resolve_booking_price",$schema['cassiopeia_captcha_resolve_booking_price']);
+    }
+    if(!db_table_exists("cassiopeia_captcha_resolve")){
+        $schema['cassiopeia_captcha_resolve'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                // tổng số
+                'total'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                // đã sử dụng
+                'used'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                // còn lại
+                'remaining'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'total' => array('total'),
+                'used' => array('used'),
+                'remaining' => array('remaining'),
+                'uid' => array('uid'),
+                'changed' => array('changed'),
+                'created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_captcha_resolve",$schema['cassiopeia_captcha_resolve']);
+    }
+    if(!db_table_exists("cassiopeia_captcha_resolve_booking")){
+        $schema['cassiopeia_captcha_resolve_booking'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                // mã đơn)
+                'booking_code'=>array(
+                    'type' => 'varchar',
+                    'length' => 255,
+                ),
+                // số lượng
+                'quantity'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                // tổng tiền
+                'total_price'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                // tình trạng 0 đang chờ, 1 hoàn thành, 2 hủy
+                'status'=>array(
+                    'type' => 'int',
+                    'size' => 'tiny',
+                ),
+                // uid người duyệt
+                'tran_user'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                // người tạo
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'booking_code' => array('booking_code'),
+                'quantity' => array('quantity'),
+                'total_price' => array('total_price'),
+                'status' => array('status'),
+                'tran_user' => array('tran_user'),
+                'uid' => array('uid'),
+                'changed' => array('changed'),
+                'created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_captcha_resolve_booking",$schema['cassiopeia_captcha_resolve_booking']);
+    }
+}

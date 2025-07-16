@@ -1,0 +1,601 @@
+<?php
+
+/**
+ * Implements hook_permission().
+ */
+function cassiopeia_user_permission() {
+  return array(
+    'cassiopeia user module' => array(
+      'title' => t('Cassiopeia user module'),
+      'description' => t('Access for cassiopeia user module'),
+    ),
+    'cassiopeia user courses' => array(
+      'title' => 'Cassiopeia user courses',
+      t('Access for Cassiopeia user courses'),
+    ),
+    'cassiopeia user transaction detail' => array(
+      'title' => 'Cassiopeia user transaction detail',
+      t('Access for cassiopeia user transaction detail'),
+    ),
+  );
+}
+
+function cassiopeia_user_user_accep_pprofile() {
+  global $user;
+  $_accep = FALSE;
+  $_arg = arg();
+
+  $_is_admin = FALSE;
+  if (!empty($user->roles)) {
+    foreach ($user->roles as $_key => $_value) {
+      if ($_value == 'administrator') {
+        $_is_admin = TRUE;
+        break;
+      }
+    }
+  }
+
+  if ($_is_admin == TRUE) {
+    $_accep = TRUE;
+  }
+  if ($_arg[0] == 'user' && $_arg[1] == $user->uid) {
+    $_accep = TRUE;
+  }
+  return $_accep;
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function cassiopeia_user_menu() {
+  $items = array();
+    $items['user/manager/transaction'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_user_transaction_page_callback',
+        'title' => t('Lịch sử giao dịch'),
+        'access callback'   => 'cassiopeia_user_accept',
+        'file' => 'cassiopeia_user.inc',
+    );
+    $items['cassiopeia/agent/ajax/autocomplete'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_user_ajax_autocomplete_callback',
+        'title' => t('Ajax'),
+        'access callback'   => 'cassiopeia_user_accept',
+        'file' => 'cassiopeia_user.inc',
+    );
+  $items['user/%user/change-password'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'title' => 'Đổi mật khẩu',
+    'page callback' => array('cassiopeia_user_user_change_password_page'),
+    'page arguments' => array(1),
+    'access callback' => 'cassiopeia_user_user_accep_pprofile',
+    'file' => 'cassiopeia_user.inc',
+  );
+  $items['user/%user/change-packet'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'title' => 'Thay đổi gói dịch vụ',
+    'page callback' => array('cassiopeia_user_user_change_packet_page'),
+    'page arguments' => array(1),
+      'access arguments'  => array('cassiopeia module'),
+    'file' => 'cassiopeia_user.inc',
+  );
+  $items['user/registered'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'title' => 'Thay đổi gói dịch vụ',
+    'page callback' => array('cassiopeia_user_registered_page'),
+    'page arguments' => array(1),
+      'access arguments'  => array('cassiopeia module'),
+    'file' => 'cassiopeia_user.inc',
+  );
+
+  return $items;
+}
+
+
+
+/**
+ * Implements hook_menu_alter().
+ */
+function cassiopeia_user_menu_alter(&$items) {
+  $items['user']['page callback'] = '_cassiopeia_user_user_page';
+    $items['user/%user']['page callback'] = 'cassiopeia_user___page_callback';
+}
+function cassiopeia_user___page_callback(){
+    $arg = arg();
+    if(count($arg)==2){
+        drupal_goto("dashboard");
+    }
+}
+
+function cassiopeia_theme_callback () {
+  return 'cassiopeia_theme';
+}
+function cassiopeia_user_theme($existing, $type, $theme, $path) {
+    $themes = array(
+        'cassiopeia_table_drag_components' => array(
+            'render element' => 'element'
+        ),
+        'user_login_form_theme' => array(
+            'render element' => 'form',
+            'template' => 'user_login_form',
+            'path' => drupal_get_path('module', 'cassiopeia_user') . '/templates/forms'
+        ),
+        'user_register_form_theme' => array(
+            'render element' => 'form',
+            'template' => 'user_register_form',
+            'path' => drupal_get_path('module', 'cassiopeia_user') . '/templates/forms'
+        ),
+        'cassiopeia_user_form_user_pass_theme' => array(
+            'render element' => 'form',
+            'template' => 'cassiopeia_user_form_user_pass_theme',
+            'path' => drupal_get_path('module', 'cassiopeia_user') . '/templates/forms'
+        ),
+    );
+    return $themes;
+}
+function _cassiopeia_user_user_page() {
+  global $user;
+  if (!empty($user->uid)) {
+    drupal_goto('user/'.$user->uid);
+  }
+  else {
+    return drupal_get_form('user_login');
+  }
+}
+
+function cassiopeia_user_password_confirm_process_2($element) {
+//print_r($element);
+//    $element['pass1']['#attributes']['placeholder'] = 'Mật khẩu mới';
+    $element['pass1']['#title'] = 'Mật khẩu mới';
+//    $element['pass1']['#value'] =  user_password().REQUEST_TIME;
+//    $element['pass1']['#theme_wrappers'] = array();
+//    $element['pass1']['#prefix'] = '<div class="input-group pass"><i class="fa fa-lock"></i>';
+//    $element['pass1']['#suffix'] = '</div>';
+
+    $element['pass2']['#title'] = 'Nhập lại mật khẩu mới';
+//    $element['pass2']['#attributes']['placeholder'] = 'Xác nhận mật khẩu mới';
+//    $element['pass2']['#theme_wrappers'] = array();
+//    $element['pass2']['#prefix'] = '<div class="input-group r-pass"><i class="fa fa-lock"></i>';
+//    $element['pass2']['#suffix'] = '</div>';
+
+    return $element;
+}
+function cassiopeia_user_user_change_password_form($form, &$form_state, $account) {
+  $form = array();
+  if (!isset($form_state['user'])) {
+    $form_state['user'] = $account;
+  }
+
+  if (empty($_SESSION['pass_reset_' . $account->uid])) {
+    $form['curent-pass'] = array(
+      '#type' => 'password',
+      '#title' => 'Mặt khẩu cũ',
+      '#element_validate' => array('cassiopeia_user_change_password_form_validate_curent_password'),
+      '#required' => TRUE,
+    );
+  }
+
+  $form['news-pass'] = array(
+    '#type' => 'password_confirm',
+    '#required' => TRUE,
+      '#process' => array('form_process_password_confirm',
+          'cassiopeia_user_password_confirm_process_2',
+          'user_form_process_password_confirm')
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Lưu',
+    '#prefix' => '<div id="user-change-password-actions">',
+    '#suffix' => '</div>',
+  );
+
+  return $form;
+}
+
+function cassiopeia_user_change_password_form_validate_curent_password($element, &$form_state) {
+  global $user;
+  $account = $form_state['user'];
+  if ($account->uid == $user->uid) {
+    require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
+    $current_pass_failed = strlen(trim($form_state['values']['curent-pass'])) == 0 || !user_check_password($form_state['values']['curent-pass'], $account);
+    if ($current_pass_failed) {
+      form_error($element, 'Mạt khẩu không đúng');
+    }
+  }
+  else {
+    form_error($element, 'Bạn không có quyền thay đổi mật khẩu');
+  }
+}
+
+function cassiopeia_user_user_change_password_form_submit($form, &$form_state) {
+  global $user;
+  $account = $form_state['user'];
+  if (strlen($form_state['values']['news-pass']) < 6) {
+    form_error($form['news-pass'], 'Mật khẩu phải  lớn hơn hoặc bàng 6 ký tự');
+  }
+  else {
+    if (!empty($user->uid) && ($user->uid == $account->uid)) {
+      require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+      require_once DRUPAL_ROOT . '/includes/password.inc';
+
+      $newhash = user_hash_password($form_state['values']['news-pass']);
+      try {
+        $updatepass = db_update('users')
+          ->fields(array('pass' => $newhash))
+          ->condition('uid', $account->uid, '=')
+          ->execute();
+        if ($updatepass) {
+          cache_clear_all();
+          if (isset($_SESSION['pass_reset_' . $form_state['user']->uid])) {
+            unset($_SESSION['pass_reset_' . $form_state['user']->uid]);
+          }
+          drupal_set_message('Thay đổi mật khẩu thành công');
+//          drupal_goto('/');
+//            $form_state['redirect'] = "/";
+        }
+
+      } catch (Exception $e) {
+//          print_r($e);
+//          die;
+        drupal_set_message('Hệ thống đang bận vui lòng quai lại sau ít phút', 'error');
+      }
+    }
+
+  }
+}
+
+function cassiopeia_user_form_user_login_alter(&$form, &$form_state, $form_id) {
+
+    drupal_set_title(t('Sign In'));
+    $form['name']['#title'] = "";
+    $form['name']['#prefix'] = "<div class=\"form-item\"> 
+    <span class=\"pull-right-container\">
+      <i class=\"far fa-lock-keyhole fa-fw\"></i>
+    </span>";
+    $form['name']['#suffix'] = "</div>";
+    $form['name']['#attributes'] = array("placeholder"=>"Email đăng nhập");
+    $form['pass']['#title'] = "";
+//    $form['pass']['#prefix'] = "<div><i class=\"fa fa-key\"></i>";
+//    $form['pass']['#suffix'] = "</div>";
+    $form['pass']['#attributes'] = array("placeholder"=>"Mật khẩu");
+//    $form['pass']['#default_value'] = "123";
+//    $form['actions']['submit']['#suffix'] = l(t('Quên mật khẩu'), 'user/password');
+    $form['hybridauth'] = array(
+        '#type' => 'hybridauth_widget',
+    );
+//    _print_r($form);
+    $form['name']['#element_validate'][] = 'cassiopeia_login_with_mail';
+    $form['#theme'][] = "user_login_form_theme";
+}
+
+function cassiopeia_user_user_login(&$edit, $account) {
+    $current_menu_item = menu_get_item();
+    $administrator_role = user_role_load_by_name('administrator');
+    $_SESSION['mobile_note'] = "note";
+    if ($administrator_role && user_has_role($administrator_role->rid,$account)) {
+        $_GET['destination']=  'admin/cassiopeia/dashboard';
+    }else {
+        if (!empty($current_menu_item['path']) && ($current_menu_item['path'] == 'user/reset/%/%/%'))  {
+            $_GET['destination'] = '/user/'.$account->uid.'/change-password';
+        }else {
+            $_GET['destination'] = "/dashboard";
+        }
+
+    }
+}
+function cassiopeia_user_form_user_register_form_alter(&$form, &$form_state) {
+    $arg = arg();
+    $form['account']['name']['#title'] = "";
+    $form['account']['name']['#description'] = "Số điện thoại có 10 chữ số và bắt đầu bằng số 0";
+    $form['account']['name']['#attributes'] = array("placeholder"=>"Số điện thoại");
+    $form['account']['mail']['#title'] = "";
+    $form['account']['mail']['#attributes'] = array("placeholder"=>"Email");
+    $form['field_full_name']['und'][0]['value']['#title'] = "";
+    $form['field_full_name']['und'][0]['value']['#attributes'] = array("placeholder"=>"Họ và tên");
+    $form['field_company']['und'][0]['value']['#title'] = "";
+    $form['field_company']['und'][0]['value']['#attributes'] = array("placeholder"=>"Tên doanh nghiệp");
+    $form['account']['pass']['#process'] = array(
+        'form_process_password_confirm',
+        'cassiopeia_user_password_confirm_process',
+        'user_form_process_password_confirm'
+    );
+    if($arg[0]=="user"){
+            $form['#theme'][] = "user_register_form_theme";
+    }
+//    print_r($form);
+    $form['name']['#element_validate'][] = 'cassiopeia_register_validation';
+    $form['#submit'] = array("_cassiopeia_user_register_submit");
+}
+function cassiopeia_register_validation($element, &$form_state){
+//    $name_input = $form_state['values']['name'];
+    $pattern = "/^(09|03|07|08|05)+([0-9]{8})$/";
+    if(preg_match($pattern, $form_state['values']['name']) !== 1){
+        form_error($element, 'Số điện thoại không hợp lệ!');
+    }
+    $form_state['values']['field_tel']['und'][0]['value'] = $form_state['values']['name'];
+    $form_state['values']['name'] = $form_state['values']['mail'];
+//    form_error($element, '!');
+//    if(!is_numeric($form_state['values']['name'])){
+//        form_error($element, 'Số điện thoại không hợp lệ!');
+//    }
+
+//    if ($user = user_load_by_name($name_input)) {
+//        drupal_set_message("Số điện thoại này đã được đăng ký!");
+//        drupal_goto("/user/register");
+//    }
+//    return TRUE;
+}
+function _cassiopeia_user_register_submit($form,&$form_state){
+    global $base_url;
+    $admin = $form_state['values']['administer_users'];
+
+    if (!variable_get('user_email_verification', TRUE) || $admin) {
+        $pass = $form_state['values']['pass'];
+    }
+    else {
+        $pass = user_password();
+    }
+    $notify = !empty($form_state['values']['notify']);
+
+    // Remove unneeded values.
+    form_state_values_clean($form_state);
+
+    $form_state['values']['pass'] = $pass;
+
+    $form_state['values']['init'] = $form_state['values']['mail'];
+
+    $account = $form['#user'];
+
+    entity_form_submit_build_entity('user', $account, $form, $form_state);
+
+    // Populate $edit with the properties of $account, which have been edited on
+    // this form by taking over all values, which appear in the form values too.
+    $edit = array_intersect_key((array) $account, $form_state['values']);
+
+    $account = user_save($account, $edit);
+
+    // Terminate if an error occurred during user_save().
+    if (!$account) {
+        drupal_set_message(t("Error saving user account."), 'error');
+        $form_state['redirect'] = '';
+        return;
+    }
+    $form_state['user'] = $account;
+    $form_state['values']['uid'] = $account->uid;
+
+    watchdog('user', 'New user: %name (%email).', array('%name' => $form_state['values']['name'], '%email' => $form_state['values']['mail']), WATCHDOG_NOTICE, l(t('edit'), 'user/' . $account->uid . '/edit'));
+
+    // Add plain text password into user account to generate mail tokens.
+    $account->password = $pass;
+
+    // New administrative account without notification.
+    $uri = entity_uri('user', $account);
+    if ($admin && !$notify) {
+        drupal_set_message(t('Created a new user account for <a href="@url">%name</a>. No e-mail has been sent.', array('@url' => url($uri['path'], $uri['options']), '%name' => $account->name)));
+    }
+    // No e-mail verification required; log in user immediately.
+    elseif (!$admin && !variable_get('user_email_verification', TRUE) && $account->status) {
+//        print_r(123);
+//        die;
+        $md5 = md5($account->name.$account->pass);
+
+//        _user_mail_notify('register_no_approval_required', $account);
+        $form_state['uid'] = $account->uid;
+//        user_login_submit(array(), $form_state);
+        $site_mail = variable_get("site_mail");
+        $cassiopeia_config_mail_active_content = variable_get('cassiopeia_config_mail_active_content', array(
+            'value' => '',
+            'format' => 'full_html'
+        ));
+
+        $content = $cassiopeia_config_mail_active_content['value'];
+        $content = str_replace("#full_name",$account->mail,$content);
+        $content = str_replace("#active_link","<a href='".$base_url."/active/".$md5."'>".$base_url."/active/".$md5."</a>",$content);
+        $body[] = $content;
+        $headers['From'] = $headers['Sender'] = $headers['Return-Path'] = "";
+        $headers['MIME-Version'] = '1.0';
+        $headers['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+        $params = array(
+            'body'      => $body,
+            'subject'   => "Xác thực cho tài khoản ".$account->field_full_name['und'][0]['value'],
+            'headers'   => $headers,
+        );
+
+//        if(drupal_mail('cassiopeia', 'custom_key',$account->mail, language_default(), $params)){
+//            _print_r($account);
+//            die;
+            $existingUser = user_load($account->uid);
+            $existingUser->status = 1;
+            $existingUser -> roles[4] = 1;
+            $existingUser->field_md5['und'][0]['value'] = $md5;
+
+            try{
+                user_save($existingUser);
+                $product = node_load(BASIC);
+                db_insert("tbl_available_product")->fields(array(
+                    "created"                => REQUEST_TIME,
+                    "uid"                    => $account->uid,
+                    "tran_user"              => $account->uid,
+                    "product"                => $product->nid,
+                    "check_backlink"         => $product->field_p_backlink_check['und'][0]['value'],
+                    "indexed_google"         => $product->field_p_indexed_google['und'][0]['value'],
+                    "content_duplicate"      => $product->field_p_content_duplicate['und'][0]['value'],
+                    "device"                 => $product->field_p_device['und'][0]['value'],
+                    "excel"                  => $product->field_p_excel_export['und'][0]['value'],
+                    "backlink_project"       => $product->field_p_backlink_project['und'][0]['value'],
+                    "key_project"            => $product->field_p_key_project['und'][0]['value'],
+                    "key_search"             => $product->field_p_key_check['und'][0]['value'],
+//                    "expired"                => strtotime('+'.$month.' months' . date('Y/m/d', REQUEST_TIME)),
+                    "status"                 => 1,
+                ))->execute();
+                $site_mail = "";
+                $content = variable_get('cassiopeia_config_mail_register_content', array(
+                    'value' => '',
+                    'format' => 'full_html'
+                ));
+                $content = $content['value'];
+                $content = str_replace("#email",$account->mail,$content);
+                $content = str_replace("#tel",$account->field_tel['und'][0]['value'],$content);
+                $content = str_replace("#full_name",$account->field_full_name['und'][0]['value'],$content);
+                $body = array();
+                $body[] = $content;
+                $mails = variable_get("cassiopeia_config_mail_register_mail");
+                $splitter = explode(",",$mails);
+                $index=1;
+                $cc = "";
+                $first = "";
+                if(!empty($splitter)){
+                    foreach($splitter as $item){
+                        if($index>1){
+                            $cc.=",".trim($item);
+                        }else{
+                            $first = $item;
+                            $cc.=trim($item);
+                        }
+                        $index++;
+                    }
+                }
+                if(!empty($cc)){
+                    $headers['Cc'] = $cc;
+                }
+                $headers['From'] = $headers['Sender'] = $headers['Return-Path'] = $site_mail;
+                $headers['MIME-Version'] = '1.0';
+                $headers['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+                $params = array(
+                    'body' => $body,
+                    'subject' => "Khách hàng ".$account->field_full_name['und'][0]['value']." đăng ký tài khoản SeoMiniSuite",
+                    'headers' => $headers,
+                );
+                if (drupal_mail('cassiopeia', 'custom_key',$first, language_default(), $params)) {
+
+                };
+            }catch (Exception $e){
+
+            }
+//        drupal_set_message("<div style=''>Đăng ký thành công!</div>Vui lòng đăng nhập bằng tài khoản vừa tạo!");
+//        };
+        user_login_submit(array(), $form_state);
+        $form_state['redirect'] = '/user/registered';
+    }
+    // No administrator approval required.
+    elseif ($account->status || $notify) {
+        $op = $notify ? 'register_admin_created' : 'register_no_approval_required';
+        _user_mail_notify($op, $account);
+        if ($notify) {
+            drupal_set_message(t('A welcome message with further instructions has been e-mailed to the new user <a href="@url">%name</a>.', array('@url' => url($uri['path'], $uri['options']), '%name' => $account->name)));
+        }
+        else {
+            drupal_set_message(t('A welcome message with further instructions has been sent to your e-mail address.'));
+            $form_state['redirect'] = '';
+        }
+    }
+    // Administrator approval required.
+    else {
+        _user_mail_notify('register_pending_approval', $account);
+        drupal_set_message(t('Thank you for applying for an account. Your account is currently pending approval by the site administrator.<br />In the meantime, a welcome message with further instructions has been sent to your e-mail address.'));
+        $form_state['redirect'] = '';
+    }
+}
+function cassiopeia_user_password_confirm_process($element) {
+//print_r($element);
+    $element['pass1']['#attributes']['placeholder'] = 'Mật khẩu';
+    $element['pass1']['#title'] = '';
+//    $element['pass1']['#value'] =  user_password().REQUEST_TIME;
+    $element['pass1']['#theme_wrappers'] = array();
+    $element['pass1']['#prefix'] = '<div class="input-group pass"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>';
+    $element['pass1']['#suffix'] = '</div>';
+
+    $element['pass2']['#title'] = '';
+    $element['pass2']['#attributes']['placeholder'] = 'Xác nhận mật khẩu';
+    $element['pass2']['#theme_wrappers'] = array();
+    $element['pass2']['#prefix'] = '<div class="input-group r-pass"><span class="input-group-addon"><i class="glyphicon glyphicon glyphicon-repeat"></i></span>';
+    $element['pass2']['#suffix'] = '</div>';
+
+    return $element;
+}
+
+function cassiopeia_user_form_user_profile_form_alter(&$form, &$form_state, $form_id){
+    unset($form['field_md5']);
+    unset($form['field_free_remaining_day']);
+    unset($form['timezone']);
+    if(!user_has_role(3)){
+        $form['#theme'] = array('cassiopeia_user_profile_form');
+        unset($form['field_account_day_point']);
+    }
+    $form['picture']['picture_upload']['#attributes'] = array("accept"=>array(".jpg,.png"));
+//    _print_r($form['picture']);
+}
+function cassiopeia_login_with_mail(&$form, &$form_state){
+    $name_input = $form_state['values']['name'];
+//    print(2);die;
+    // Try loading by email.
+//    if ($user = user_load_by_mail($name_input)) {
+//        // Set the username for further validation.
+//        $form_state['values']['name'] = $user->name;
+//        return TRUE;
+//    }else{
+//        drupal_set_message("Email hoặc mật khẩu không đúng, vui lòng kiểm tra lại!");
+//        drupal_goto("/user/login");
+//    }
+
+    // Try loading by username.
+    if ($user = user_load_by_name($name_input)) {
+        return FALSE;
+    }
+//print("jkl");die;
+    return FALSE;
+}
+function cassiopeia_user_form_user_cancel_confirm_form_alter(&$form,&$form_state){
+//    $form['user_cancel_method'] = array(
+//        "#type"     => "item",
+//        "user_cancel_delete"     => "item",
+//    );
+//    _print_r($form);
+    unset($form['user_cancel_method']);
+    unset($form['user_cancel_confirm']);
+    unset($form['description']);
+    if($form['uid']['#value']==1){
+        unset($form['actions']);
+    }else{
+        $form['#submit'] = array("cassiopeia_user_form_user_cancel_confirm_form_alter_submit");
+    }
+//    _print_r($form['#submit']);
+}
+function cassiopeia_user_form_user_cancel_confirm_form_alter_submit(&$form,&$form_state){
+    if($form_state['values']['uid']!=1 || !user_has_role(3,user_external_load($form_state['values']['uid']))){
+        user_delete($form_state['values']['uid']);
+    }
+//    $form_state['values']['user_cancel_method'] = "user_cancel_delete";
+    $form_state['redirect'] = "/admin/manager/user";
+}
+function cassiopeia_user_form_user_pass_alter(&$form,&$form_state){
+    $form['name']['#title'] = "Địa chỉ email để lấy lại mật khẩu";
+    unset($form['name']['#title']);
+    $form['name']['#attributes']['placeholder'] = "Email";
+    $form['#theme'][] = "cassiopeia_user_form_user_pass_theme";
+    $form['#submit'][] = "cassiopeia_user_form_user_pass_alter_submit";
+}
+function cassiopeia_user_form_user_pass_alter_submit($form,&$form_state){
+//    print_r($form);
+//    die;
+}
+function cassiopeia_user_user_load_by_tel($tel){
+    try{
+        $query = db_select("users","tbl_user");
+        $query->fields("tbl_user");
+        $query->join("field_data_field_tel","field_tel","field_tel.entity_id=tbl_user.uid");
+        $query->condition("field_tel.bundle","user");
+        $query->condition("field_tel.field_tel_value",$tel);
+        $result = $query->execute()->fetchObject();
+        if(!empty($result)){
+            return user_load($result->uid);
+        }else{
+            return null;
+        }
+    }catch (Exception $e){
+        return null;
+    }
+}

@@ -1,0 +1,9 @@
+name = Cassiopeia advertisement
+description = Cassiopeia advertisement module
+core = 7.x
+package = Cassiopeia
+dependencies[] = linkimagefield
+
+; Information added by drupal.org packaging script on 2011-11-10
+version = "7.0"
+datestamp = "1328134560"

@@ -1,0 +1,841 @@
+<?php
+define("CAPTCHA_API_KEY",trim(variable_get("2captcha_api_key")));
+function cassiopeia_captcha_menu() {
+    $items = [];
+    $items['cassiopeia-captcha/resolve/get-info'] = [
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_get_info',
+        'title' => 'Recaptcha 2 resolve',
+        'access arguments' => array("access content"),
+        'delivery callback' => 'drupal_json_output',
+//        'file' => 'cassiopeia_captcha.inc',
+    ];
+    $items['captcha/resolve/booking/payment/%cassiopeia_captcha_resolve_booking'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_booking_payment_page',
+        'page arguments' => array(4),
+        'title' => t('Thanh toán'),
+        'access callback' => 'cassiopeia_user_accept',
+        'file' => 'cassiopeia_captcha.inc',
+    );
+    $items['captcha/resolve/booking'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_booking_page',
+        'title' => t('Mua lượt giải captcha'),
+        'access callback' => 'cassiopeia_user_accept',
+        'file' => 'cassiopeia_captcha.inc',
+    );
+    $items['cassiopeia-captcha/resolve'] = [
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_page',
+        'title' => 'Recaptcha 2 resolve',
+        'access arguments' => array("access content"),
+        'delivery callback' => 'drupal_json_output',
+        'file' => 'cassiopeia_captcha.inc',
+    ];
+    $items['admin/manager/captcha/resolve/booking/price'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_booking_price_page',
+        'title' => t('Giá giải mã captcha'),
+        'access arguments' => array('cassiopeia module'),
+        'file' => 'cassiopeia_captcha.inc',
+    );
+    $items['admin/manager/captcha/resolve/booking/price/%cassiopeia_captcha_resolve_booking_price/edit'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_booking_price_edit_page',
+        'page arguments' => array(6),
+        'title' => t('Cập nhật'),
+        'access arguments' => array('cassiopeia module'),
+        'file' => 'cassiopeia_captcha.inc',
+    );
+    $items['admin/manager/captcha/resolve/booking/price/%cassiopeia_captcha_resolve_booking_price/delete'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_booking_price_delete_page',
+        'page arguments' => array(6),
+        'title' => t('Xóa'),
+        'access arguments' => array('cassiopeia module'),
+        'file' => 'cassiopeia_captcha.inc',
+    );
+    $items['admin/manager/captcha/resolve/booking/price/add'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_resolve_booking_price_add_page',
+        'title' => t('Thêm mới'),
+        'access arguments' => array('cassiopeia module'),
+        'file' => 'cassiopeia_captcha.inc',
+    );
+    $items['admin/manager/captcha/resolve/booking'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_admin_resolve_booking_page',
+        'title' => t('Đơn hàng'),
+        'access arguments' => array('cassiopeia module'),
+        'file' => 'cassiopeia_captcha.inc',
+    );
+    $items['admin/manager/captcha/resolve/booking/%cassiopeia_captcha_resolve_booking/delete'] = array(
+        'type' => MENU_CALLBACK,
+        'page callback' => 'cassiopeia_captcha_admin_resolve_booking_delete_page',
+        'page arguments' => array(5),
+        'title' => t('Đơn hàng'),
+        'access arguments' => array('cassiopeia module'),
+        'file' => 'cassiopeia_captcha.inc',
+    );
+        $items['admin/manager/captcha/resolve/config'] = array(
+            'type' => MENU_NORMAL_ITEM,
+            'title' => t('Cấu hình'),
+            'page callback' => array('drupal_get_form'),
+            'page arguments' => array('cassiopeia_captcha_resolve_config_f'),
+            'access arguments' => array('cassiopeia module'),
+//            'file' => 'cassiopeia_captcha.inc',
+        );
+  $items['admin/manager/captcha/resolve/%user/edit'] = array(
+    'type'              => MENU_CALLBACK,
+    'page callback'     => 'cassiopeia_captcha_user_captcha_resolve_edit_callback',
+    'page arguments'     => array(4),
+    'title'             => t('Lượt giải captcha'),
+    'access arguments' => array('cassiopeia module'),
+    'file'              => 'cassiopeia_captcha.inc',
+  );
+    return $items;
+}
+function cassiopeia_captcha_resolve_booking_price_load($id){
+    try{
+        $query = db_select("cassiopeia_captcha_resolve_booking_price","cassiopeia_captcha_resolve_booking_price");
+        $query->fields("cassiopeia_captcha_resolve_booking_price");
+        $query->condition("id",$id);
+        $result = $query->execute()->fetchObject();
+        return $result;
+    }catch (Exception $e){
+        return null;
+    }
+}
+function cassiopeia_captcha_resolve_booking_load($code){
+    try{
+        $query = db_select("cassiopeia_captcha_resolve_booking","cassiopeia_captcha_resolve_booking");
+        $query->fields("cassiopeia_captcha_resolve_booking");
+        $query->condition("booking_code",$code);
+        $result = $query->execute()->fetchObject();
+        return $result;
+    }catch (Exception $e){
+        return null;
+    }
+}
+function cassiopeia_captcha_resolve_booking_price_form($form,&$form_state,$data = array("price"=>null)){
+    $price = $form['#price'] = $form_state['#price'] = !empty($data['price'])?$data['price']:new stdClass();
+    $form['quantity'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Số lượt'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#attributes'   => array("placeholder"=>"Nhập số lượt giải captcha","class"=>array("seo-input ")),
+        '#required' => TRUE
+    );
+    $form['price'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Giá tiền / 1k lượt'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#attributes'   => array("placeholder"=>"Nhập giá tiền cho mỗi 1k lượt","class"=>array("seo-input ")),
+        '#required' => TRUE
+    );
+    $form['percent'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Giảm giá (%)'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#default_value' => 0,
+        '#required' => TRUE
+    );
+    $form['weight'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Độ nặng'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#attributes'   => array("placeholder"=>"Nhập độ nặng để thay đổi thứ tự hiển thị","class"=>array("seo-input ")),
+        '#required' => TRUE
+    );
+    if(!empty($price->id)){
+        $form['quantity']['#default_value'] = $price->quantity;
+        $form['price']['#default_value'] = $price->price;
+        $form['weight']['#default_value'] = $price->weight;
+        $form['percent']['#default_value'] = $price->percent;
+    }
+    $form['save'] = array(
+        '#type'     =>'submit',
+        '#value'    => 'Lưu',
+        '#attributes'   => array("class"=>array("btn-green border-none")),
+    );
+    return $form;
+}
+function cassiopeia_captcha_resolve_booking_price_form_submit($form,&$form_state){
+    global $user;
+    try{
+        $node = $form_state['#price'];
+        $node->quantity = $form_state['values']['quantity'];
+        $node->price = str_replace(",","",str_replace(".","",$form_state['values']['price']));
+        $node->weight = $form_state['values']['weight'];
+        $node->percent = $form_state['values']['percent'];
+        if(!empty($node->id)){
+            $node->changed = REQUEST_TIME;
+            drupal_write_record("cassiopeia_captcha_resolve_booking_price",$node,array("id"));
+            drupal_set_message("Cập nhật thành công!");
+        }else{
+            $node->uid = $user->uid;
+            $node->created = REQUEST_TIME;
+            $node->changed = REQUEST_TIME;
+            drupal_write_record("cassiopeia_captcha_resolve_booking_price",$node);
+            drupal_set_message("Thêm mới thành công!");
+        }
+    }catch (Exception $e){
+
+    }
+}
+function cassiopeia_captcha_theme($existing, $type, $theme, $path) {
+    $themes = array(
+        'cassiopeia_captcha_resolve_booking_form' => array(
+            'render element' => 'form',
+            'template' => 'cassiopeia_captcha_resolve_booking_form',
+            'path' => drupal_get_path('module', 'cassiopeia_captcha') . '/templates/forms'
+        ),
+    );
+    return $themes;
+}
+function cassiopeia_captcha_resolve_booking_form($form,&$form_state){
+    $form_wrapper = "cassiopeia_captcha_resolve_booking_form_wrapper";
+    $form['#prefix'] = "<div id='".$form_wrapper."'>";
+    $form['#suffix'] = "</div>";
+    $form['#attributes']['class'][] = "cassiopeia-captcha-resolve-booking-form cassiopeia-guest-post-domain-change-booking-form";
+    $query = db_select("cassiopeia_captcha_resolve_booking_price","cassiopeia_captcha_resolve_booking_price");
+    $query->fields("cassiopeia_captcha_resolve_booking_price");
+    $query->orderBy("cassiopeia_captcha_resolve_booking_price.weight","ASC");
+    $result = $query->execute()->fetchAll();
+    $default_value = !empty($result)?array_values($result)[0]:null;
+    $options = array();
+    if(!empty($result)){
+        foreach($result as $item){
+            $promotion = "";
+            if($item->percent>0){
+                $promotion = "<div class='promotion'>Tiết kiệm ".$item->percent." %</div>";
+            }
+            $options[$item->id] = "
+            <div>
+    ".$promotion."
+    <div class='quantity'>".$item->quantity." lượt</div>
+    <div class='price'>".number_format($item->price,0,",",".")."đ/1k lượt</div>
+</div>
+            ";
+        }
+    }
+    $form['price'] = array(
+        '#type' => 'radios',
+        '#title' => t(''),
+        '#options' => $options,
+        '#default_value' => !empty($default_value)?$default_value->id:"",
+        '#ajax' => array(
+            'callback' => 'cassiopeia_captcha_resolve_booking_form_ajax',
+            'wrapper' => $form_wrapper,
+            'progress' => "none",
+        ),
+    );
+    $form['submit'] = array(
+        '#type'     =>'submit',
+        '#value'    => 'Thanh toán',
+        '#attributes'   => array("class"=>array("btn-green border-none btn-medium")),
+        '#ajax' => array(
+            'callback' => 'cassiopeia_captcha_resolve_booking_form_submit_ajax',
+        ),
+    );
+    return $form;
+}
+function cassiopeia_captcha_resolve_booking_form_ajax($form,&$form_state){
+    return $form;
+}
+function cassiopeia_captcha_resolve_booking_form_submit_ajax($form,&$form_state){
+    ctools_include('ajax');
+    ctools_add_js('ajax-responder');
+    $commands[] = ctools_ajax_command_redirect($form_state['#redirect']);
+    //        $commands[] = ctools_ajax_command_redirect('user/manager/topup');
+    print ajax_render($commands);
+    exit;
+}
+function cassiopeia_captcha_resolve_booking_form_submit($form,&$form_state){
+    global $user;
+    try{
+        $last_booking = db_query("SELECT booking_code
+      FROM cassiopeia_captcha_resolve_booking
+      WHERE booking_code LIKE 'CR%'
+      ORDER BY
+          SUBSTRING(booking_code, 3) + 0 DESC,
+          booking_code DESC
+      LIMIT 1;")->fetchObject();;
+        if(!empty($last_booking)){
+            $last_code = $last_booking->booking_code;
+            $last_code = str_replace("CR","",$last_code);
+            $last_code = (int)$last_code+1;
+            $len = strlen($last_code);
+            $max = 6-$len;
+            if($max>=1){
+                for($i=1;$i<=$max;$i++){
+                    $last_code = "0".$last_code;
+                }
+            }
+            $booking_code = "CR".$last_code;
+        }else{
+            $booking_code = "CR000001";
+        }
+
+        $price = cassiopeia_captcha_resolve_booking_price_load($form_state['values']['price']);
+        $node = new stdClass();
+        $node->uid = $user->uid;
+        $node->quantity = $price->quantity;
+        $node->total_price = $price->price*$price->quantity/1000;
+        $node->status=0;
+        $node->booking_code=$booking_code;
+        cassiopeia_captcha_resolve_booking_save($node);
+      $account = user_load($user->uid);
+      cassiopeia_captcha_resolve_send_booking_mail($account,$node);
+        $form_state['#redirect'] = "/captcha/resolve/booking/payment/".$booking_code;
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        drupal_set_message("Đã xảy ra lỗi!");
+    }
+}
+function cassiopeia_captcha_resolve_booking_save($booking){
+    global $user;
+    try{
+        if(!empty($booking->id)){
+            $booking->changed = REQUEST_TIME;
+            drupal_write_record("cassiopeia_captcha_resolve_booking",$booking,array("id"));
+        }else{
+            $booking->uid = $user->uid;
+            $booking->created = $booking->changed = REQUEST_TIME;
+            drupal_write_record("cassiopeia_captcha_resolve_booking",$booking);
+        }
+    }catch (Exception $e){
+
+    }
+}
+function cassiopeia_captcha_resolve_booking_price_delete_form ($form, &$form_state, $price) {
+    $form_state['#price'] = $price;
+    $form = confirm_form($form,
+        t('Bạn có chắc chắn muốn xóa mục này?'),
+        'admin/manager/captcha/resolve/booking/price',
+        '<p>' . t('This action cannot be undone.') .'</p>',
+        t('Delete'),
+        t('Cancel'),
+        'confirm'
+    );
+    $form['actions']['cancel']['#attributes'] = array('class'=>array('btn btn-icon-before btn-open-search bg-primary c-white'), 'style'=>array('display: inline-block;'));
+    $form['actions']['cancel']['#options']['html']  = true;
+    //  $form['actions']['cancel']['#options']['text']  = '<i class="fal fa-magnifying-glass fa-fw" aria-hidden="true"></i> Cancel';
+    $form['actions']['cancel']['#title']  = '<i class="fal fa-ban fa-fw" aria-hidden="true"></i> '. t('Cancel');
+    $form['actions']['submit']['#icon'] ='<span class="fal fa-trash fa-fw"></span>';
+    $form['#submit'][] = 'cassiopeia_captcha_resolve_booking_price_delete_form_form_submit';
+    return $form;
+}
+function cassiopeia_captcha_resolve_booking_price_delete_form_form_submit($form,&$form_state){
+    try{
+        db_delete("cassiopeia_captcha_resolve_booking_price")->condition("id",$form_state['#price']->id)->execute();
+    }catch(Exception $e){
+
+    }
+}
+function cassiopeia_captcha_resolve_booking_filter_form($form,&$form_state,$cache){
+    $form['#attributes']['class'][] = "custom-filter";
+    $form['code'] = array(
+        '#type'         => 'textfield',
+        '#title'        => t('Mã đơn hàng'),
+        '#size'         => 60,
+        '#maxlength'    => 128,
+    );
+    if(!empty($cache['code'])){
+        $form['code']['#default_value'] = $cache['code'];
+    }
+    $form['from_date'] = array(
+        '#type' => 'date_popup',
+        '#default_value' => !empty($cache['from_date'])?$cache['from_date']:"",
+        '#date_type' => DATE_DATETIME,
+        '#date_timezone' => date_default_timezone(),
+        '#date_format' => 'd-m-Y',
+        '#date_increment' => 1,
+        '#date_year_range' => '-10:+10',
+        '#attributes' => array( "class" => array("form_date")),
+    );
+    if(!empty($cache['from_date'])){
+        $form['from_date']['#default_value'] = $cache['from_date'];
+    }
+    $form['to_date'] = array(
+        '#type' => 'date_popup',
+        '#default_value' => !empty($cache['to_date'])?$cache['to_date']:"",
+        '#date_type' => DATE_DATETIME,
+        '#date_timezone' => date_default_timezone(),
+        '#date_format' => 'd-m-Y',
+        '#date_increment' => 1,
+        '#date_year_range' => '-10:+10',
+        '#attributes' => array( "class" => array("to_date")),
+    );
+    $users = cassiopeia_get_users_by_roles(array(4));
+    $options = array();
+    $options['all'] = "Tất cả";
+    foreach($users as $_user){
+        $options[$_user->uid] = !empty($_user->field_full_name['und'][0]['value'])?$_user->field_full_name['und'][0]['value']:$_user->mail;
+    }
+    $form['account'] = array(
+        '#type'     => 'select',
+        '#title'    => t('Tài khoản'),
+        '#options'  => $options,
+    );
+    if(!empty($cache['account'])){
+        $form['account']['#default_value'] = $cache['account'];
+    }
+    $form['status'] = array(
+        '#type' => 'select',
+        '#title' => t('Tình trạng'),
+        '#options' => array(
+            'all'   => "Tất cả",
+            0   => "Đang chờ",
+            1   => "Hoàn thành",
+            2   => "Đã hủy",
+        ),
+        '#default_value' => isset($cache['status'])?$cache['status']:"all",
+        '#required' => TRUE,
+    );
+    $form['submit'] = array(
+        '#type'     => 'submit',
+        '#value'    => t('Lọc'),
+        '#prefix'   => "<div class='buttons'>",
+        '#suffix'   => "</div>",
+    );
+
+    return $form;
+}
+function cassiopeia_captcha_resolve_booking_filter_form_submit($form, &$form_state)
+{
+    $arg = arg();
+    $options = array(
+        'query' => array(
+            'data' => $form_state['values'],
+        )
+    );
+    $form_state['redirect'] = array("/admin/manager/captcha/resolve/booking", "data" => $options);
+}
+function cassiopeia_captcha_resolve_booking_edit_form($form,&$form_state,$data = array("booking"=>null)){
+    $form_state['#booking'] = $booking = $data['booking'];
+    $form['status'] = array(
+        '#type' => 'select',
+        '#title' => t('Tình trạng'),
+        '#options' => array(
+            0   => "Đang chờ",
+            1   => "Hoàn thành",
+            2   => "Đã hủy",
+        ),
+        '#default_value' => $booking->status,
+        '#required' => TRUE,
+    );
+    $form['submit'] = array(
+        '#type'     =>'submit',
+        '#value'    => 'Lưu',
+        '#attributes'   => array("class"=>array("btn-green border-none")),
+        '#ajax' => array(
+            'callback' => 'cassiopeia_captcha_resolve_booking_edit_form_ajax_submit',
+        ),
+    );
+    return $form;
+}
+function cassiopeia_captcha_resolve_booking_edit_form_ajax_submit($form,&$form_state){
+    ctools_include('ajax');
+    ctools_include('modal');
+    $commands[] = ctools_modal_command_dismiss();
+    $commands[] = ctools_ajax_command_reload();
+    return array(
+        '#type'     => 'ajax',
+        '#commands' => $commands,
+    );
+}
+
+function cassiopeia_captcha_resolve_booking_edit_form_submit($form,&$form_state){
+    global $user;
+    $node = $form_state['#booking'];
+    if($node->status!=1){
+        $node->status = $form_state['values']['status'];
+        $node->tran_user = $user->uid;
+        drupal_write_record("cassiopeia_captcha_resolve_booking",$node,array("id"));
+        if($form_state['values']['status']==1){
+            $change = cassiopeia_captcha_resolve_load($node->uid);
+            $change->total+=$node->quantity;
+            $change->remaining+=$node->quantity;
+            cassiopeia_captcha_resolve_save($change);
+        }
+    }
+}
+function cassiopeia_captcha_resolve_save($change){
+    try{
+        if(!empty($change->id)){
+            $change->changed = REQUEST_TIME;
+            drupal_write_record("cassiopeia_captcha_resolve",$change,array("id"));
+        }else{
+            $change->created = REQUEST_TIME;
+            $change->changed = REQUEST_TIME;
+            drupal_write_record("cassiopeia_captcha_resolve",$change);
+        }
+    }catch (Exception $e){
+
+    }
+}
+function cassiopeia_captcha_resolve_load($uid){
+    try{
+        $query = db_select("cassiopeia_captcha_resolve","cassiopeia_captcha_resolve");
+        $query->fields("cassiopeia_captcha_resolve");
+        $query->condition("uid",$uid);
+        $result = $query->execute()->fetchObject();
+        if(empty($result)){
+            $result = new stdClass();
+            $result->total = 0;
+            $result->used = 0;
+            $result->remaining = 0;
+            $result->uid = $uid;
+            cassiopeia_captcha_resolve_save($result);
+            return $result;
+        }
+        return $result;
+    }catch (Exception $e){
+        $result = new stdClass();
+        $result->total = 0;
+        $result->used = 0;
+        $result->remaining = 0;
+        return $result;
+    }
+}
+function cassiopeia_captcha_resolve_booking_delete_form ($form, &$form_state, $booking) {
+    $form_state['#booking'] = $booking;
+    $form = confirm_form($form,
+        t('Bạn có chắc chắn muốn xóa đơn hàng %name?', array('%name' => $booking->booking_code)),
+        'admin/manager/captcha/resolve/booking',
+        '<p>' . t('This action cannot be undone.') .'</p>',
+        t('Delete'),
+        t('Cancel'),
+        'confirm'
+    );
+    $form['actions']['cancel']['#attributes'] = array('class'=>array('btn btn-icon-before btn-open-search bg-primary c-white'), 'style'=>array('display: inline-block;'));
+    $form['actions']['cancel']['#options']['html']  = true;
+    //  $form['actions']['cancel']['#options']['text']  = '<i class="fal fa-magnifying-glass fa-fw" aria-hidden="true"></i> Cancel';
+    $form['actions']['cancel']['#title']  = '<i class="fal fa-ban fa-fw" aria-hidden="true"></i> '. t('Cancel');
+    $form['actions']['submit']['#icon'] ='<span class="fal fa-trash fa-fw"></span>';
+    $form['#submit'][] = 'cassiopeia_captcha_resolve_booking_delete_form_submit';
+    return $form;
+}
+function cassiopeia_captcha_resolve_booking_delete_form_submit($form,&$form_state){
+    try{
+        if($form_state['#booking']->status!=1){
+            db_delete("cassiopeia_captcha_resolve_booking")->condition("id",$form_state['#booking']->id)->execute();
+            drupal_set_message("Xóa thành công!");
+        }else{
+            drupal_set_message("Đơn hàng không thể xóa!");
+        }
+    }catch(Exception $e){
+        drupal_set_message("Đã xảy ra lỗi!");
+    }
+}
+function cassiopeia_captcha_resolve_page(){
+    global $user;
+    $data = array();
+    $data['success'] = false;
+    if($_SERVER['SERVER_NAME']=="seominisuite.com"){
+        $_data = json_decode(file_get_contents('php://input'));
+        $user_captcha_resolve = cassiopeia_captcha_resolve_load($_data->uid);
+        if($user_captcha_resolve->remaining>0){ // còn lượt giải captcha
+            $url = $_data->url;
+            $data_sitekey = $_data->data_sitekey;
+            $data_s = $_data->data_s;
+            try {
+                $params = new stdClass();
+                $params->websiteKey = $data_sitekey;
+                $params->recaptchaDataSValue = $data_s;
+                $params->websiteURL = $url;
+                $result = cassiopeia_captcha_resolve_run($params);
+            } catch (\Exception $e) {
+                $result['success'] = false;
+            }
+            if($result['success']){
+                $data['code'] = $result['code'];
+                $data['success'] = true;
+
+                $user_captcha_resolve->used++;
+                $user_captcha_resolve->remaining--;
+                cassiopeia_captcha_resolve_save($user_captcha_resolve);
+              cassiopeia_captcha_resolve_getBalance();
+            }
+        }else{ // hết lượt giải captcha
+            $data['success'] = false;
+            $data['limited'] = true;
+        }
+//        $data['server'] = ($_SERVER);
+//        $data['result'] = ($result);
+    }
+    return $data;
+}
+function cassiopeia_captcha_resolve_run($data){
+    $result = cassiopeia_captcha_resolve_createTask($data);
+//    _print_r($result);
+    if($result->errorId==0){ // create task thành công
+        sleep(5);
+        $count = 1;
+        $_result = cassiopeia_captcha_resolve_getTaskResult($result->taskId,$count);
+        return $_result;
+    }else{ // create task thất bại
+//        _print_r("create task thất bại");
+        return null;
+    }
+}
+function cassiopeia_captcha_resolve_getTaskResult($task_id,&$count){
+    $return = array();
+    $return['success'] = false;
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://api.2captcha.com/getTaskResult',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS =>'{
+    "clientKey":"'.CAPTCHA_API_KEY.'",
+   "taskId": '.$task_id.'
+}',
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json'
+        ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    $result = json_decode($response);
+    if($result->errorId==0){ //
+        if($result->status=="processing"){ // đang thực hiện
+            if($count<=10){ // gọi tối đa 10 lần
+                sleep(5);
+                $count++;
+                $_result = cassiopeia_captcha_resolve_getTaskResult($task_id,$count);
+                $_result['message'] = "redo";
+                return $_result;
+            }else{
+                $return['message'] = "redo";
+                return $return;
+            }
+        }elseif($result->status=="ready"){ // giải thành công
+            $return['success'] = true;
+            $return['code'] = $result->solution->gRecaptchaResponse;
+        }
+    }else{ // lỗi
+        $return['message'] = "Lỗi";
+        return $return;
+    }
+    return $return;
+}
+function cassiopeia_captcha_resolve_createTask($data){
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, [
+        CURLOPT_URL => 'https://api.2captcha.com/createTask',
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => TRUE,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => '{
+    "clientKey":"'.CAPTCHA_API_KEY.'",
+    "task": {
+        "type":"RecaptchaV2Task",
+        "websiteURL":"'.$data->websiteURL.'",
+        "recaptchaDataSValue": "'.$data->recaptchaDataSValue.'",
+        "websiteKey":"'.$data->websiteKey.'",
+        "proxyType":"http",
+        "proxyAddress":"1.2.3.4",
+        "proxyPort":"8080"
+    }
+}',
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json'
+        ],
+    ]);
+    $response = curl_exec($curl);
+    curl_close($curl);
+    $result = json_decode($response);
+    return $result;
+}
+function cassiopeia_captcha_resolve_get_info(){
+    global $user;
+    $data = new stdClass();
+    $user_captcha_resolve = cassiopeia_captcha_resolve_load($user->uid);
+    $data->remaining = $user_captcha_resolve->remaining;
+    return $data;
+}
+function cassiopeia_captcha_resolve_config_form() {
+    $form = array();
+    $form['2captcha_api_key'] = array(
+        '#type' => "textfield",
+        '#title' => '2captcha API KEY',
+        "#default_value" => variable_get('2captcha_api_key', ''),
+    );
+    return system_settings_form($form);
+}
+function cassiopeia_captcha_resolve_send_booking_mail($account,$node){
+  $cc = "";
+  $cc_mail = variable_get("cassiopeia_config_captcha_resolve_receiver_mails");
+  $splitter = explode(",",$cc_mail);
+  $index=1;
+  if(!empty($splitter)){
+    foreach($splitter as $item){
+      if($index>1){
+        $cc.=",".trim($item);
+      }else{
+        $cc.=trim($item);
+      }
+      $index++;
+    }
+  }
+  $full_name = !empty($account->field_full_name['und'][0]['value'])?$account->field_full_name['und'][0]['value']:"";
+  $field_tel = !empty($account->field_tel['und'][0]['value'])?$account->field_tel['und'][0]['value']:"";
+  $body[] = "<table class=\"table table-hover table-stripped\">
+    <tbody>
+        <tr>
+            <td>Họ tên:</td>
+            <td>".$full_name."</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>".$account->mail."</td>
+        </tr>
+        <tr>
+            <td>Số điện thoại:</td>
+            <td>".$field_tel."</td>
+        </tr> 
+        <tr>
+            <td>Số tiền:</td>
+            <td>".number_format($node->total_price,0,",",".")." VND</td>
+        </tr>
+    </tbody>
+</table>";
+//  _print_r($splitter);
+//  die;
+  $headers['From'] = $headers['Sender'] = $headers['Return-Path'] = "";
+  $headers['MIME-Version'] = '1.0';
+  $headers['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+  if(!empty($cc)){
+    $headers['Cc'] = $cc;
+  }
+  $params = array(
+    'body' => $body,
+    'subject' => "Khách hàng ".$full_name." mua ".$node->quantity." lượt giải Captcha tự động",
+    'headers' => $headers,
+  );
+  if (drupal_mail('cassiopeia_captcha', 'custom_key', $splitter[0], language_default(), $params)) {};
+}
+function cassiopeia_captcha_mail($key, &$message, $params){
+  switch ($key) {
+    case 'custom_key':
+      $message['subject'] = $params['subject'];
+      $message['body'] = $params['body'];
+      $message['headers'] = $params['headers'];
+      break;
+  }
+
+}
+function cassiopeia_captcha_user_captcha_resolve_edit_form($form,&$form_state,$data = array("account"=>null    )){
+  $form_state['#account'] = $account = $data['account'];
+  $form_state['#domain_change'] = $domain_change = cassiopeia_captcha_resolve_load($account->uid);
+  $form['remaining'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Số lượt giải captcha còn lại'),
+    '#size' => 60,
+    '#maxlength' => 128,
+    '#required' => TRUE,
+    '#default_value' => !empty($domain_change)?$domain_change->remaining:0,
+  );
+  $form['save'] = array(
+    '#type'     =>'submit',
+    '#value'    => 'Lưu',
+  );
+
+  return $form;
+}
+function cassiopeia_captcha_user_captcha_resolve_edit_form_submit($form,&$form_state){
+  try{
+    $change = $form_state['#domain_change'];
+    $change->total=$form_state['values']['remaining'];
+    $change->remaining=$form_state['values']['remaining'];
+    cassiopeia_captcha_resolve_save($change);
+  }catch (Exception $e){
+
+  }
+}
+function cassiopeia_captcha_resolve_getBalance(){
+  $last_check = variable_get("getBalance_changed",0);
+  $current = strtotime(date("d-m-Y H:i",REQUEST_TIME));
+  if($current-$last_check>=15*60){
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => 'https://api.2captcha.com/getBalance',
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => '',
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 0,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => 'POST',
+      CURLOPT_POSTFIELDS =>'{
+    "clientKey":"'.CAPTCHA_API_KEY.'"
+}',
+      CURLOPT_HTTPHEADER => array(
+        'Content-Type: application/json'
+      ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    $result = json_decode($response);
+    if($result->errorId==0){
+      $balance = $result->balance;
+      if($balance<20){
+        variable_set("getBalance_changed",strtotime(date("d-m-Y H:i",REQUEST_TIME)));
+        $cc = "";
+        $cc_mail = variable_get("cassiopeia_config_captcha_resolve_receiver_mails");
+        $splitter = explode(",",$cc_mail);
+        $index=1;
+        if(!empty($splitter)){
+          foreach($splitter as $item){
+            if($index>1){
+              $cc.=",".trim($item);
+            }else{
+              $cc.=trim($item);
+            }
+            $index++;
+          }
+        }
+        $body[] = "Tài khoản 2captcha.com còn dưới 20$";
+        $headers['From'] = $headers['Sender'] = $headers['Return-Path'] = "";
+        $headers['MIME-Version'] = '1.0';
+        $headers['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+        if(!empty($cc)){
+          $headers['Cc'] = $cc;
+        }
+        $params = array(
+          'body' => $body,
+          'subject' => "Tài khoản 2captcha.com còn dưới 20$ (".date("d/m/Y H:i",REQUEST_TIME).")",
+          'headers' => $headers,
+        );
+        if (drupal_mail('cassiopeia_captcha', 'custom_key', $splitter[0], language_default(), $params)) {};
+      }
+    }
+  }
+
+//  return $result;
+}

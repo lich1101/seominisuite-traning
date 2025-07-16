@@ -1,0 +1,2306 @@
+<?php
+
+function cassiopeia_guest_post_install() {
+
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function cassiopeia_guest_post_schema() {
+    $schema['cassiopeia_guest_post_article_log'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'aid'=>array(
+                'type' => 'int',
+                'default' => 0
+            ),
+            'wp_post' => array(
+                'type' => 'text',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'coc_uid' => array('uid'),
+            'coc_changed' => array('changed'),
+            'coc_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_order_content'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+                'not null' => TRUE,
+            ),
+            'raw_title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'website' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'raw_website' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'price' => array(
+                'type' => 'float',
+            ),
+            'promotion_price' => array(
+                'type' => 'float',
+            ),
+            'discount' => array(
+                'type' => 'float',
+            ),
+            'tel' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'email' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            // 0 pending, 1 done, 2 cancel
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'coc_title' => array('title'),
+            'coc_raw_title' => array('raw_title'),
+            'coc_website' => array('website'),
+            'coc_raw_website' => array('raw_website'),
+            'coc_status' => array('status'),
+            'coc_uid' => array('uid'),
+            'coc_changed' => array('changed'),
+            'coc_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_point_exchange'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'code' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'tel'=>array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'point'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            // 0 pending, 1 done, 2 fail
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+            ),
+            'note' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'receiver'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cassiopeia_guest_post_point_exchange_code' => array('code'),
+            'cassiopeia_guest_post_point_exchange_tel' => array('tel'),
+            'cassiopeia_guest_post_point_exchange_point' => array('point'),
+            'cassiopeia_guest_post_point_exchange_receiver' => array('receiver'),
+            'cassiopeia_guest_post_point_exchange_uid' => array('uid'),
+            'cassiopeia_guest_post_point_exchange_changed' => array('changed'),
+            'cassiopeia_guest_post_point_exchange_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_complain'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'code' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'content' => array(
+                'type' => 'blob',
+                'size' => 'big',
+            ),
+            'note' => array(
+                'type' => 'blob',
+                'size' => 'big',
+            ),
+            'tran_user'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'aid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            // đối tượng bị khiếu nại
+            'target_id'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            //1 người đăng, 2 chủ website
+            'target'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'not null' => TRUE,
+                'default' => 1
+            ),
+            'point'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'defendant_point'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            // 0 pending, 1 done, 2 cancel, 3 fail
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'start' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+            ),
+            'end' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cassiopeia_guest_post_complain_end' => array('end'),
+            'cassiopeia_guest_post_complain_start' => array('start'),
+            'cassiopeia_guest_post_complain_status' => array('status'),
+            'cassiopeia_guest_post_complain_point' => array('point'),
+            'cassiopeia_guest_post_complain_target_id' => array('target_id'),
+            'cassiopeia_guest_post_complain_aid' => array('aid'),
+            'cassiopeia_guest_post_complain_uid' => array('uid'),
+            'cassiopeia_guest_post_complain_changed' => array('changed'),
+            'cassiopeia_guest_post_complain_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_domain_change_booking_price'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'quantity'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+                'not null' => TRUE,
+                'default' => 1
+            ),
+            'price'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+                'not null' => TRUE,
+                'default' => 100000
+            ),
+            'weight'=>array(
+                'type' => 'int',
+                'default' => 0
+            ),
+            'percent'=>array(
+                'type' => 'float',
+                'default' => 0
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cassiopeia_guest_post_domain_change_booking_price_quantity' => array('quantity'),
+            'cassiopeia_guest_post_domain_change_booking_price_price' => array('price'),
+            'cassiopeia_guest_post_domain_change_booking_price_uid' => array('uid'),
+            'cassiopeia_guest_post_domain_change_booking_price_changed' => array('changed'),
+            'cassiopeia_guest_post_domain_change_booking_price_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_domain'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'domain' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'article_count'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'backlink_count'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            // 0 chưa hoạt động, 1 hoạt động
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cassiopeia_guest_post_domain_domain' => array('domain'),
+            'cassiopeia_guest_post_domain_title' => array('title'),
+            'cassiopeia_guest_post_domain_article_count' => array('article_count'),
+            'cassiopeia_guest_post_domain_article_backlink_count' => array('backlink_count'),
+            'cassiopeia_guest_post_domain_article_status' => array('status'),
+            'cassiopeia_guest_post_domain_uid' => array('uid'),
+            'cassiopeia_guest_post_domain_changed' => array('changed'),
+            'cassiopeia_guest_post_domain_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_domain_change'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'total'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            'used'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            'remaining'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cassiopeia_guest_post_domain_change_total' => array('total'),
+            'cassiopeia_guest_post_domain_change_used' => array('used'),
+            'cassiopeia_guest_post_domain_change_remaining' => array('remaining'),
+            'cassiopeia_guest_post_domain_change_uid' => array('uid'),
+            'cassiopeia_guest_post_domain_change_changed' => array('changed'),
+            'cassiopeia_guest_post_domain_change_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_domain_change_booking'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'booking_code'=>array(
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'quantity'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            'total_price'=>array(
+                'type' => 'int',
+                'size' => 'normal',
+            ),
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+            ),
+            'tran_user'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cassiopeia_guest_post_domain_change_booking_uid' => array('uid'),
+            'cassiopeia_guest_post_domain_change_booking_changed' => array('changed'),
+            'cassiopeia_guest_post_domain_change_booking_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_user_point'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'point'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'first'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'default' => 0
+            ),
+            // 0 inactive , 1 active
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'default' => 1
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cgp_user_point_point' => array('point'),
+            'cgp_user_point_uid' => array('uid'),
+            'cgp_user_point_changed' => array('changed'),
+            'cgp_user_point_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_user_point_revision'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'note' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'point'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cgp_user_point_revision_point' => array('point'),
+            'cgp_user_point_revision_uid' => array('uid'),
+            'cgp_user_point_revision_changed' => array('changed'),
+            'cgp_user_point_revision_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_user_day_point'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'point'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+              // 0 inactive , 1 active
+            'status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'default' => 1
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cgp_user_day_point_point' => array('point'),
+            'cgp_user_day_point_uid' => array('uid'),
+            'cgp_user_day_point_changed' => array('changed'),
+            'cgp_user_day_point_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_user_day_point_revision'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'note' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'point'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cgp_user_day_point_revision_point' => array('point'),
+            'cgp_user_day_point_revision_uid' => array('uid'),
+            'cgp_user_day_point_revision_changed' => array('changed'),
+            'cgp_user_day_point_revision_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_tag'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+                'not null' => TRUE,
+            ),
+            'description' => array(
+                'type' => 'text',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cgp_tag_title' => array('title'),
+            'cgp_tag_uid' => array('uid'),
+            'cgp_tag_changed' => array('changed'),
+            'cgp_tag_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_article_tag'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'aid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'tid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cgpa_tag_aid' => array('aid'),
+            'cgpa_tag_tid' => array('tid'),
+            'cgpa_tag_uid' => array('uid'),
+            'cgpa_tag_changed' => array('changed'),
+            'cgpa_tag_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_article'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+                'not null' => TRUE,
+            ),
+            'content' => array(
+                'type' => 'blob',
+                'size' => 'big',
+            ),
+            'url_guest_post' => array(
+                'type' => 'varchar',
+                'length' => 1000,
+            ),
+            'website'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'image'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'seo_title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'seo_description' => array(
+                'type' => 'text',
+            ),
+            'fb_image'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'fb_title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'fb_description' => array(
+                'type' => 'text',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'post_status'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+            ),
+            'publish_date'=>array(
+                'type' => 'int',
+            ),
+            'post_id'=>array(
+                'type' => 'int',
+            ),
+            're_post'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'default' => 0,
+            ),
+            'draft'=>array(
+                'type' => 'int',
+                'size' => 'tiny',
+                'default' => 0,
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cgpa_title' => array('title'),
+            'cgpa_url_guest_post' => array('url_guest_post'),
+            'cgpa_website' => array('website'),
+            'cgpa_seo_title' => array('seo_title'),
+            'cgpa_fb_title' => array('fb_title'),
+            'cgpa_uid' => array('uid'),
+            'cgpa_changed' => array('changed'),
+            'cgpa_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_website'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'domain' => array(
+                'type' => 'varchar',
+                'length' => '255',
+                'not null' => TRUE,
+            ),
+            'href' => array(
+                'type' => 'varchar',
+                'length' => '255',
+            ),
+            'ref_domain' => array(
+                'type' => 'int',
+            ),
+            'organic_traffic' => array(
+                'type' => 'int',
+            ),
+            'posted' => array(
+                'type' => 'int',
+            ),
+            'posted_of_day' => array(
+                'type' => 'int',
+            ),
+            'last_posted_date' => array(
+                'type' => 'int',
+            ),
+            // 0 Lỗi, 1 OK
+            'status' => array(
+                'type' => 'int',
+                'size' => 'tiny',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cww_domain' => array('domain'),
+            'cww_href' => array('href'),
+            'cww_ref_domain' => array('ref_domain'),
+            'cww_organic_traffic' => array('organic_traffic'),
+            'cww_posted' => array('posted'),
+            'cww_posted_of_day' => array('posted_of_day'),
+            'cww_last_posted_date' => array('last_posted_date'),
+            'cww_uid' => array('uid'),
+            'cww_changed' => array('changed'),
+            'cww_created' => array('created'),
+        ),
+    );
+    // danh mục theo trang wordpress
+    $schema['cassiopeia_guest_post_category'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+                'not null' => TRUE,
+            ),
+            'tid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'website'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cwc_title' => array('title'),
+            'cwc_uid' => array('uid'),
+            'cwc_changed' => array('changed'),
+            'cwc_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_website_category'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'title' => array(
+                'type' => 'varchar',
+                'length' => '255',
+                'not null' => TRUE,
+            ),
+            'tid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cwwc_uid' => array('uid'),
+            'cwwc_title' => array('title'),
+            'cwwc_changed' => array('changed'),
+            'cwwc_created' => array('created'),
+        ),
+    );
+    $schema['cassiopeia_guest_post_website_field_tx_category'] = array(
+        'fields' => array(
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+            ),
+            'entity_id'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'tid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'uid'=>array(
+                'type' => 'int',
+                'size' => 'big',
+                'not null' => TRUE,
+                'default' => 0
+            ),
+            'changed' => array(
+                'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created' => array(
+                'description' => 'The Unix timestamp when the trademark was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+        ),
+        'primary key' => array('id'),
+        'indexes' => array(
+            'cwwctxc_uid' => array('uid'),
+            'cwwctxc_title' => array('title'),
+            'cwwctxc_changed' => array('changed'),
+            'cwwctxc_created' => array('created'),
+        ),
+    );
+
+
+    return $schema;
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function cassiopeia_guest_post_uninstall() {
+    db_drop_table("cassiopeia_guest_post_article");
+    db_drop_table("cassiopeia_guest_post_website");
+    db_drop_table("cassiopeia_guest_post_category");
+    db_drop_table("cassiopeia_guest_post_website_category");
+}
+function cassiopeia_guest_post_update_7113() {
+    $field = array(
+        'type' => 'int',
+    );
+
+    db_add_field('cassiopeia_guest_post_article', 'image',$field);
+}
+function cassiopeia_guest_post_update_7114() {
+    $_transaction = db_transaction();
+    try{
+        $seo_title = array(
+            'type' => 'varchar',
+            'length' => '255',
+        );
+        $seo_description = array(
+            'type' => 'text',
+        );
+        $fb_image=array(
+            'type' => 'int',
+            'size' => 'big',
+        );
+        $fb_title = array(
+            'type' => 'varchar',
+            'length' => '255',
+        );
+        $fb_description = array(
+            'type' => 'text',
+        );
+
+        db_add_field('cassiopeia_guest_post_article', 'seo_title',$seo_title);
+        db_add_field('cassiopeia_guest_post_article', 'seo_description',$seo_description);
+        db_add_field('cassiopeia_guest_post_article', 'fb_image',$fb_image);
+        db_add_field('cassiopeia_guest_post_article', 'fb_title',$fb_title);
+        db_add_field('cassiopeia_guest_post_article', 'fb_description',$fb_description);
+
+        // create table tag
+        $schema['cassiopeia_guest_post_tag'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'title' => array(
+                    'type' => 'varchar',
+                    'length' => '255',
+                    'not null' => TRUE,
+                ),
+                'description' => array(
+                    'type' => 'text',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cgp_tag_title' => array('title'),
+                'cgp_tag_uid' => array('uid'),
+                'cgp_tag_changed' => array('changed'),
+                'cgp_tag_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_tag",$schema['cassiopeia_guest_post_tag']);
+        //create table article tag
+        $schema['cassiopeia_guest_post_article_tag'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'aid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'tid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cgpa_tag_aid' => array('aid'),
+                'cgpa_tag_tid' => array('tid'),
+                'cgpa_tag_uid' => array('uid'),
+                'cgpa_tag_changed' => array('changed'),
+                'cgpa_tag_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_article_tag",$schema['cassiopeia_guest_post_article_tag']);
+    }catch (Exception $e){
+        _print_r($e);
+        $_transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7115() {
+    $_transaction = db_transaction();
+    try{
+        $post_status = array(
+            'type' => 'int',
+            'size' => 'tiny',
+        );
+        $publish_date = array(
+            'type' => 'int',
+        );
+        $int = array(
+            'type' => 'int',
+        );
+
+        db_add_field('cassiopeia_guest_post_article', 'post_status',$post_status);
+        db_add_field('cassiopeia_guest_post_article', 'publish_date',$publish_date);
+        db_add_field('cassiopeia_guest_post_article', 'post_id',$int);
+    }catch (Exception $e){
+        _print_r($e);
+        $_transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7116() {
+    $_transaction = db_transaction();
+    try{
+        $schema['cassiopeia_guest_post_user_point'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'point'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cgp_user_point_point' => array('point'),
+                'cgp_user_point_uid' => array('uid'),
+                'cgp_user_point_changed' => array('changed'),
+                'cgp_user_point_created' => array('created'),
+            ),
+        );
+        $schema['cassiopeia_guest_post_user_point_revision'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'note' => array(
+                    'type' => 'varchar',
+                    'length' => '255',
+                ),
+                'point'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cgp_user_point_revision_point' => array('point'),
+                'cgp_user_point_revision_uid' => array('uid'),
+                'cgp_user_point_revision_changed' => array('changed'),
+                'cgp_user_point_revision_created' => array('created'),
+            ),
+        );
+        $schema['cassiopeia_guest_post_user_day_point'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'point'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cgp_user_day_point_point' => array('point'),
+                'cgp_user_day_point_uid' => array('uid'),
+                'cgp_user_day_point_changed' => array('changed'),
+                'cgp_user_day_point_created' => array('created'),
+            ),
+        );
+        $schema['cassiopeia_guest_post_user_day_point_revision'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'note' => array(
+                    'type' => 'varchar',
+                    'length' => '255',
+                ),
+                'point'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cgp_user_day_point_revision_point' => array('point'),
+                'cgp_user_day_point_revision_uid' => array('uid'),
+                'cgp_user_day_point_revision_changed' => array('changed'),
+                'cgp_user_day_point_revision_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_user_point",$schema['cassiopeia_guest_post_user_point']);
+        db_create_table("cassiopeia_guest_post_user_point_revision",$schema['cassiopeia_guest_post_user_point_revision']);
+        db_create_table("cassiopeia_guest_post_user_day_point",$schema['cassiopeia_guest_post_user_day_point']);
+        db_create_table("cassiopeia_guest_post_user_day_point_revision",$schema['cassiopeia_guest_post_user_day_point_revision']);
+    }catch (Exception $e){
+        _print_r($e);
+        $_transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7117() {
+    $transaction = db_transaction();
+    try{
+        $int = array(
+            'type' => 'int',
+            'size' => 'big',
+        );
+        db_add_field('cassiopeia_guest_post_category', 'tid',$int);
+        $schema['cassiopeia_guest_post_website_category'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'title' => array(
+                    'type' => 'varchar',
+                    'length' => '255',
+                    'not null' => TRUE,
+                ),
+                'tid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cwwc_uid' => array('uid'),
+                'cwwc_title' => array('title'),
+                'cwwc_changed' => array('changed'),
+                'cwwc_created' => array('created'),
+            ),
+        );
+        $schema['cassiopeia_guest_post_website_field_tx_category'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'entity_id'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'tid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cwwctxc_uid' => array('uid'),
+                'cwwctxc_title' => array('title'),
+                'cwwctxc_changed' => array('changed'),
+                'cwwctxc_created' => array('created'),
+            ),
+        );
+        db_drop_table("cassiopeia_guest_post_website_category");
+        db_create_table("cassiopeia_guest_post_website_category",$schema['cassiopeia_guest_post_website_category']);
+        db_create_table("cassiopeia_guest_post_website_field_tx_category",$schema['cassiopeia_guest_post_website_field_tx_category']);
+    }catch (Exception $e){
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7119() {
+    $transaction = db_transaction();
+    try{
+        $schema['cassiopeia_guest_post_website_field_tx_category'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'entity_id'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'tid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cwwctxc_uid' => array('uid'),
+                'cwwctxc_changed' => array('changed'),
+                'cwwctxc_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_website_field_tx_category",$schema['cassiopeia_guest_post_website_field_tx_category']);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7120() {
+    $transaction = db_transaction();
+    try{
+        $schema['cassiopeia_guest_post_domain'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'domain' => array(
+                    'type' => 'varchar',
+                    'length' => '255',
+                ),
+                'title' => array(
+                    'type' => 'varchar',
+                    'length' => '255',
+                ),
+                'article_count'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'backlink_count'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                // 0 chưa hoạt động, 1 hoạt động
+                'status'=>array(
+                    'type' => 'int',
+                    'size' => 'tiny',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cassiopeia_guest_post_domain_domain' => array('domain'),
+                'cassiopeia_guest_post_domain_title' => array('title'),
+                'cassiopeia_guest_post_domain_article_count' => array('article_count'),
+                'cassiopeia_guest_post_domain_article_backlink_count' => array('backlink_count'),
+                'cassiopeia_guest_post_domain_article_status' => array('status'),
+                'cassiopeia_guest_post_domain_uid' => array('uid'),
+                'cassiopeia_guest_post_domain_changed' => array('changed'),
+                'cassiopeia_guest_post_domain_created' => array('created'),
+            ),
+        );
+        $schema['cassiopeia_guest_post_domain_change'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'total'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                'used'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                'remaining'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cassiopeia_guest_post_domain_change_total' => array('total'),
+                'cassiopeia_guest_post_domain_change_used' => array('used'),
+                'cassiopeia_guest_post_domain_change_remaining' => array('remaining'),
+                'cassiopeia_guest_post_domain_change_uid' => array('uid'),
+                'cassiopeia_guest_post_domain_change_changed' => array('changed'),
+                'cassiopeia_guest_post_domain_change_created' => array('created'),
+            ),
+        );
+        $schema['cassiopeia_guest_post_domain_change_booking'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'booking_code'=>array(
+                    'type' => 'varchar',
+                    'length' => 255,
+                ),
+                'quantity'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                'total_price'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                ),
+                'status'=>array(
+                    'type' => 'int',
+                    'size' => 'tiny',
+                ),
+                'tran_user'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cassiopeia_guest_post_domain_change_booking_uid' => array('uid'),
+                'cassiopeia_guest_post_domain_change_booking_changed' => array('changed'),
+                'cassiopeia_guest_post_domain_change_booking_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_domain",$schema['cassiopeia_guest_post_domain']);
+        db_create_table("cassiopeia_guest_post_domain_change",$schema['cassiopeia_guest_post_domain_change']);
+        db_create_table("cassiopeia_guest_post_domain_change_booking",$schema['cassiopeia_guest_post_domain_change_booking']);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7121() {
+    $transaction = db_transaction();
+    try{
+        $schema['cassiopeia_guest_post_domain_change_booking_price'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'quantity'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                    'not null' => TRUE,
+                    'default' => 1
+                ),
+                'price'=>array(
+                    'type' => 'int',
+                    'size' => 'normal',
+                    'not null' => TRUE,
+                    'default' => 100000
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cassiopeia_guest_post_domain_change_booking_price_quantity' => array('quantity'),
+                'cassiopeia_guest_post_domain_change_booking_price_price' => array('price'),
+                'cassiopeia_guest_post_domain_change_booking_price_uid' => array('uid'),
+                'cassiopeia_guest_post_domain_change_booking_price_changed' => array('changed'),
+                'cassiopeia_guest_post_domain_change_booking_price_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_domain_change_booking_price",$schema['cassiopeia_guest_post_domain_change_booking_price']);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7122() {
+    $transaction = db_transaction();
+    try{
+        $int = array(
+            'type' => 'int',
+            'default' => 0,
+        );
+        db_add_field('cassiopeia_guest_post_domain_change_booking_price', 'weight',$int);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7123() {
+    $transaction = db_transaction();
+    try{
+        $int = array(
+            'type' => 'float',
+            'default' => 0,
+        );
+        db_add_field('cassiopeia_guest_post_domain_change_booking_price', 'percent',$int);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7124() {
+    $transaction = db_transaction();
+    try{
+        $schema['cassiopeia_guest_post_complain'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'content' => array(
+                    'type' => 'blob',
+                    'size' => 'big',
+                ),
+                'aid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                //1 người đăng, 2 chủ website
+                'target_id'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'point'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                // 0 pending, 1 done, 2 cancel, 3 fail
+                'status'=>array(
+                    'type' => 'int',
+                    'size' => 'tiny',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'start' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                ),
+                'end' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'cassiopeia_guest_post_complain_end' => array('end'),
+                'cassiopeia_guest_post_complain_start' => array('start'),
+                'cassiopeia_guest_post_complain_status' => array('status'),
+                'cassiopeia_guest_post_complain_point' => array('point'),
+                'cassiopeia_guest_post_complain_target_id' => array('target_id'),
+                'cassiopeia_guest_post_complain_aid' => array('aid'),
+                'cassiopeia_guest_post_complain_uid' => array('uid'),
+                'cassiopeia_guest_post_complain_changed' => array('changed'),
+                'cassiopeia_guest_post_complain_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_complain",$schema['cassiopeia_guest_post_complain']);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7125() {
+    $transaction = db_transaction();
+    try{
+          $target=array(
+            'type' => 'int',
+            'size' => 'tiny',
+            'not null' => TRUE,
+            'default' => 1
+        );
+        db_add_field('cassiopeia_guest_post_complain', 'target',$target);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7126() {
+    $transaction = db_transaction();
+    try{
+          $title = array(
+             'type' => 'varchar',
+             'length' => '255',
+         );
+        db_add_field('cassiopeia_guest_post_complain', 'title',$title);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7127() {
+    $transaction = db_transaction();
+    try{
+         $first = array(
+            'type' => 'int',
+            'size' => 'tiny',
+            'default' => 0
+        );
+        db_add_field('cassiopeia_guest_post_user_point', 'first',$first);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7128() {
+    $transaction = db_transaction();
+    try{
+         $first = array(
+            'type' => 'int',
+            'size' => 'tiny',
+            'default' => 0
+        );
+        db_add_field('cassiopeia_guest_post_website', 'status',$first);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7129() {
+    $transaction = db_transaction();
+    try{
+         $int = array(
+            'type' => 'int',
+            'size' => 'big',
+            'default' => 0
+        );
+        db_add_field('cassiopeia_guest_post_category', 'website',$int);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7130() {
+    $transaction = db_transaction();
+    try{
+        $note = array(
+            'type' => 'blob',
+            'size' => 'big',
+        );
+        $tran_user = array(
+            'type' => 'int',
+            'size' => 'big',
+        );
+        db_add_field('cassiopeia_guest_post_complain', 'note',$note);
+        db_add_field('cassiopeia_guest_post_complain', 'tran_user',$tran_user);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7131() {
+    $transaction = db_transaction();
+    try{
+       $re_post=array(
+           'type' => 'int',
+           'size' => 'tiny',
+           'default' => 0,
+       );
+        db_add_field('cassiopeia_guest_post_article', 're_post',$re_post);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7132() {
+    $transaction = db_transaction();
+    try{
+       $re_post=array(
+           'type' => 'varchar',
+           'length' => '255',
+       );
+        db_add_field('cassiopeia_guest_post_complain', 'code',$re_post);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7133() {
+    $transaction = db_transaction();
+    try{
+       $schema['cassiopeia_guest_post_point_exchange'] = array(
+           'fields' => array(
+               'id' => array(
+                   'type' => 'serial',
+                   'unsigned' => TRUE,
+                   'not null' => TRUE,
+               ),
+               'code' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               'tel'=>array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               'point'=>array(
+                   'type' => 'int',
+                   'size' => 'big',
+               ),
+               'receiver'=>array(
+                   'type' => 'int',
+                   'size' => 'big',
+               ),
+               'status'=>array(
+                   'type' => 'int',
+                   'size' => 'tiny',
+               ),
+               'note' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               'uid'=>array(
+                   'type' => 'int',
+                   'size' => 'big',
+                   'not null' => TRUE,
+                   'default' => 0
+               ),
+               'changed' => array(
+                   'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                   'type' => 'int',
+                   'not null' => TRUE,
+                   'default' => 0,
+               ),
+               'created' => array(
+                   'description' => 'The Unix timestamp when the trademark was created.',
+                   'type' => 'int',
+                   'not null' => TRUE,
+                   'default' => 0,
+               ),
+           ),
+           'primary key' => array('id'),
+           'indexes' => array(
+               'cassiopeia_guest_post_point_exchange_code' => array('code'),
+               'cassiopeia_guest_post_point_exchange_tel' => array('tel'),
+               'cassiopeia_guest_post_point_exchange_point' => array('point'),
+               'cassiopeia_guest_post_point_exchange_receiver' => array('receiver'),
+               'cassiopeia_guest_post_point_exchange_uid' => array('uid'),
+               'cassiopeia_guest_post_point_exchange_changed' => array('changed'),
+               'cassiopeia_guest_post_point_exchange_created' => array('created'),
+           ),
+       );
+       db_create_table("cassiopeia_guest_post_point_exchange",$schema['cassiopeia_guest_post_point_exchange']);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7134() {
+    $transaction = db_transaction();
+    try{
+       $schema['cassiopeia_guest_post_order_content'] = array(
+           'fields' => array(
+               'id' => array(
+                   'type' => 'serial',
+                   'unsigned' => TRUE,
+                   'not null' => TRUE,
+               ),
+               'title' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+                   'not null' => TRUE,
+               ),
+               'raw_title' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               'website' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               'raw_website' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               'price' => array(
+                   'type' => 'float',
+               ),
+               'promotion_price' => array(
+                   'type' => 'float',
+               ),
+               'discount' => array(
+                   'type' => 'float',
+               ),
+               'tel' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               'email' => array(
+                   'type' => 'varchar',
+                   'length' => '255',
+               ),
+               // 0 pending, 1 done, 2 cancel
+               'status'=>array(
+                   'type' => 'int',
+                   'size' => 'tiny',
+                   'not null' => TRUE,
+                   'default' => 0
+               ),
+               'tran_user'=>array(
+                   'type' => 'int',
+                   'size' => 'big',
+                   'default' => 0
+               ),
+               'uid'=>array(
+                   'type' => 'int',
+                   'size' => 'big',
+                   'not null' => TRUE,
+                   'default' => 0
+               ),
+               'changed' => array(
+                   'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                   'type' => 'int',
+                   'not null' => TRUE,
+                   'default' => 0,
+               ),
+               'created' => array(
+                   'description' => 'The Unix timestamp when the trademark was created.',
+                   'type' => 'int',
+                   'not null' => TRUE,
+                   'default' => 0,
+               ),
+           ),
+           'primary key' => array('id'),
+           'indexes' => array(
+               'coc_title' => array('title'),
+               'coc_raw_title' => array('raw_title'),
+               'coc_website' => array('website'),
+               'coc_raw_website' => array('raw_website'),
+               'coc_status' => array('status'),
+               'coc_uid' => array('uid'),
+               'coc_changed' => array('changed'),
+               'coc_created' => array('created'),
+           ),
+       );
+       db_create_table("cassiopeia_guest_post_order_content",$schema['cassiopeia_guest_post_order_content']);
+       db_drop_table("cassiopeia_order_content");
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7135() {
+    $transaction = db_transaction();
+    try{
+         $tran_user=array(
+              'type' => 'int',
+              'size' => 'big',
+              'default' => 0
+          );
+      db_add_field('cassiopeia_guest_post_order_content', 'tran_user',$tran_user);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7136() {
+    $transaction = db_transaction();
+    try{
+         $defendant_point=array(
+              'type' => 'int',
+              'size' => 'big',
+              'default' => 0
+          );
+      db_add_field('cassiopeia_guest_post_complain', 'defendant_point',$defendant_point);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7137() {
+    $transaction = db_transaction();
+    try{
+         $status = array(
+             'type' => 'int',
+             'size' => 'tiny',
+             'default' => 1
+         );
+      db_add_field('cassiopeia_guest_post_user_point', 'status',$status);
+      db_add_field('cassiopeia_guest_post_user_day_point', 'status',$status);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7138() {
+    $transaction = db_transaction();
+    try{
+        $schema['cassiopeia_guest_post_article_log'] = array(
+            'fields' => array(
+                'id' => array(
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'not null' => TRUE,
+                ),
+                'aid'=>array(
+                    'type' => 'int',
+                    'default' => 0
+                ),
+                'wp_post' => array(
+                    'type' => 'text',
+                ),
+                'uid'=>array(
+                    'type' => 'int',
+                    'size' => 'big',
+                    'not null' => TRUE,
+                    'default' => 0
+                ),
+                'changed' => array(
+                    'description' => 'The Unix timestamp when the trademark was most recently saved.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+                'created' => array(
+                    'description' => 'The Unix timestamp when the trademark was created.',
+                    'type' => 'int',
+                    'not null' => TRUE,
+                    'default' => 0,
+                ),
+            ),
+            'primary key' => array('id'),
+            'indexes' => array(
+                'coc_uid' => array('uid'),
+                'coc_changed' => array('changed'),
+                'coc_created' => array('created'),
+            ),
+        );
+        db_create_table("cassiopeia_guest_post_article_log",$schema['cassiopeia_guest_post_article_log']);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}
+function cassiopeia_guest_post_update_7139() {
+    $transaction = db_transaction();
+    try{
+       $draft = array(
+           'type' => 'int',
+           'size' => 'tiny',
+           'default' => 0,
+       );
+       db_add_field('cassiopeia_guest_post_article', 'draft',$draft);
+    }catch (Exception $e){
+        _print_r($e);
+        die;
+        $transaction->rollback();
+    }
+}

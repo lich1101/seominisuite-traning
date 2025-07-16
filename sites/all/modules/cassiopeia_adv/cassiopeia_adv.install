@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * Create simplenews node type.
+ */
+function cassiopeia_adv_install() {
+  // Create a newsletter type if needed.
+  $type = node_type_get_type('cassiopeia_adv');
+  if (!$type) {
+    $type = node_type_set_defaults(array(
+      'type' => 'cassiopeia_adv',
+      'name' => 'Quảng cáo',
+      'base' => 'node_content',
+      'description' => t('Quảng cáo.'),
+      'locked' => 0,
+      'custom' => 1,
+      'modified' => 1,
+      ));
+    node_type_save($type);
+  }
+}
+
+
+

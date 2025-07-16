@@ -1,0 +1,6 @@
+name = Cassiopeia Database Optimizer
+description = Tối ưu hóa cơ sở dữ liệu cho Cassiopeia
+core = 7.x
+package = Cassiopeia
+version = 7.x-1.0
+dependencies[] = cassiopeia
