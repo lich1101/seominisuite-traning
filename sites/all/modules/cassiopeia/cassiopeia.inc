@@ -405,9 +405,32 @@ function cassiopeia_keyword_project_detail_page_callback($pid) {
                 $export = cassiopeia_create_keywords_export($keywords,$pid);
 //                _print_r($export);
                 if(!empty($export)){
-                    drupal_goto("excel/download/".$export['name']);
+                    // Serve the file directly instead of redirecting
+                    $filename = $export['name'];
+                    $file_path = drupal_realpath("public://".$filename);
+                    
+                    if ($file_path && file_exists($file_path)) {
+                        header('Pragma: public');
+                        header('Expires: 0');
+                        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+                        header('Cache-Control: private', false);
+                        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                        header('Content-Disposition: attachment; filename="'. basename($filename) . '"');
+                        header('Content-Transfer-Encoding: binary');
+                        header('Content-Length: ' . filesize($file_path));
+                        
+                        readfile($file_path);
+                        if (file_exists($file_path)) {
+                            unlink($file_path);
+                        }
+                        exit;
+                    } else {
+                        drupal_set_message("Không thể tạo file Excel. Vui lòng thử lại.", 'error');
+                        drupal_goto("quan-ly-keywords/du-an/".$arg[2]);
+                    }
                 }else{
-//                    print("ff");
+                    drupal_set_message("Không thể tạo file Excel. Vui lòng thử lại.", 'error');
+                    drupal_goto("quan-ly-keywords/du-an/".$arg[2]);
                 }
 //                cassiopeia_keyword_export($keywords,$pid);
             }else{

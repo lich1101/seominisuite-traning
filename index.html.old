@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO MiniSuite - Phần mềm SEO cho nhà Quản lý</title>
+    <link rel="icon" type="image/x-icon" href="./img/logo-icon.jpg">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet " href="./css/style.css ">
+    <link rel="stylesheet " href="./css/responsive.css">
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="【Miễn Phí】Phần mềm SEO| Quản trị SEO hiệu quả" />
+    <meta property="og:description" content="Quản lý Backlink, Quản lý thứ hạng từ khóa, Kiểm tra đạo văn【Không giới hạn tính năng】" />
+    <meta property="og:url" content="https://seominisuite.com/index.html" />
+    <meta property="og:site_name" content="SEO MiniSuite" />
+    <meta property="article:modified_time" content=" 2021-10-06T03:04:57+00:00 " />
+    <meta property="og:image" content="https://seominisuite.com/img/seominisuite-img-social.png" />
+    <meta property="og:image:alt" content="https://seominisuite.com/img/seominisuite-img-social.jpg" />
+    <!--<meta property="og:image:width" content="1200" />-->
+    <!--<meta property="og:image:height" content="630" />-->
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Google Tag Manager -->
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PK6CJGGP');</script>
+    <!-- End Google Tag Manager -->
+    <!-- End Google Tag Manager -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-219593858-1"></script>-->
+<!--    <script>-->
+<!--        window.dataLayer = window.dataLayer || [];-->
+
+<!--        function gtag() {-->
+<!--            dataLayer.push(arguments);-->
+<!--        }-->
+<!--        gtag('js', new Date());-->
+
+<!--        gtag('config', 'UA-219593858-1');-->
+<!--    </script>-->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DYJT4X4PR"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-3DYJT4X4PR');
+    </script>
+    <script>
+        ! function(w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = w[t] = w[t] || [];
+            ttq.methods = ["page", "track", "identify", "instances", "debug", "on", "off", "once", "ready", "alias", "group", "enableCookie", "disableCookie"], ttq.setAndDefer = function(t, e) {
+                t[e] = function() {
+                    t.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+                }
+            };
+            for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+            ttq.instance = function(t) {
+                for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++) ttq.setAndDefer(e, ttq.methods[n]);
+                return e
+            }, ttq.load = function(e, n) {
+                var i = "https://analytics.tiktok.com/i18n/pixel/events.js";
+                ttq._i = ttq._i || {}, ttq._i[e] = [], ttq._i[e]._u = i, ttq._t = ttq._t || {}, ttq._t[e] = +new Date, ttq._o = ttq._o || {}, ttq._o[e] = n || {};
+                var o = document.createElement("script");
+                o.type = "text/javascript", o.async = !0, o.src = i + "?sdkid=" + e + "&lib=" + t;
+                var a = document.getElementsByTagName("script")[0];
+                a.parentNode.insertBefore(o, a)
+            };
+
+            ttq.load('C8NFN97177STLBSB77R0');
+            ttq.page();
+        }(window, document, 'ttq');
+    </script>
+
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '3693585007549007');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+                 src="https://www.facebook.com/tr?id=3693585007549007&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+    <script async="" src="https://s.zzcdn.me/ztr/ztracker.js?id=7131195001178062848"></script>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PK6CJGGP"
+                      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <!-- End Google Tag Manager (noscript) -->
+    <header class=" header ">
+        <div class=" header-container container ">
+            <div class=" header-inner ">
+                <div class=" header-logo ">
+                    <div class=" header-logo-content ">
+                        <h1>
+                            <a href=" ./index.html ">
+                                <img src=" ./img/logo.png " class=" logo " alt=" ">
+                            </a>
+                        </h1>
+                    </div>
+                </div>
+
+                <div class=" header-main ">
+                    <div class=" header-main-content ">
+                        <div class=" header-user ">
+                            <ul>
+                                <!--<li>-->
+                                    <!--<a href=" https://seominisuite.com/bang-gia " data-title='Bảng giá'></a>-->
+                                <!--</li>-->
+                                <li>
+                                    <a href="https://www.facebook.com/groups/seominisuite/" target="blank" data-title='Hỗ trợ 24/7'></a>
+                                </li>
+                                <li>
+                                    <a href=" https://seominisuite.com/user " data-title='Đăng nhập'></a>
+                                </li>
+                                <li class=" active ">
+                                    <a href=" https://seominisuite.com/user/register " data-title='Dùng miễn phí'></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="banner">
+        <div class=" banner-container container ">
+            <div class=" banner-inner ">
+                <div class=" row ">
+                    <div class=" col-xs-12 col-sm-6 col-md-5 ">
+                        <div class=" banner-text ">
+                            <h2 data-aos="fade-up" data-aos-delay="50">
+                                <p>Tiết kiệm 50%</p>
+                                <p>Thời gian <span>Quản lý SEO</span></p>
+                                <p>với công cụ miễn phí <span>SEO MiniSuite</span></p>
+                            </h2>
+                            <a href=" https://seominisuite.com/user/register " class=" btn-white " data-aos="fade-up" data-aos-delay="150">Dùng miễn phí</a>
+                        </div>
+                    </div>
+                    <div class=" col-xs-12 col-sm-6 col-md-7 ">
+                        <div class=" banner-img " data-aos="fade-left" data-aos-delay="50">
+                            <img src=" ./img/banner.png " class=" img-responsive " alt=" ">
+                            <span class=" icon-play ">
+                                <img src=" ./img/icons/play.png " class=" img-responsive ">
+                                <a href=" # " data-toggle="modal" data-target="#VideoModal"></a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <div class=" home-page ">
+            <div class=" home-page-container ">
+                <div class=" home-page-inner ">
+                    <section class=" sec sec-1 ">
+                        <div class=" sec-container container ">
+                            <div class="sec-inner">
+                                <div class="sec-title mb-50">
+                                    <h2 class=" heading-secondary " data-aos="fade-down">Dành 5 phút mỗi ngày quản lý SEO hiệu quả</h2>
+                                </div>
+                                <div class="sec-content">
+                                    <div class=" row ">
+                                        <div class=" sec-left col-xs-12 col-sm-6 col-md-6 " data-aos="fade-right" data-aos-delay=" 150 ">
+                                            <div class=" sec-left-title ">
+                                                <h3 class=" heading-tertiary ">Quản lý Backlink</h3>
+                                            </div>
+                                            <div class=" sec-left-content ">
+                                                <ul>
+                                                    <li>
+                                                        <div>
+                                                            <span class="icon">
+                                                                <img src=" ./img/icons/ld-icon-1.png " alt=" ">
+                                                            </span>
+                                                            <span>Kiểm tra tự động số liệu Backlink</span>
+                                                        </div>
+                                                        <ul>
+                                                            <li>
+                                                                <span>Thuộc tính Do/Nofollow - ucg/sponsor</span>
+                                                            </li>
+                                                            <li>
+                                                                <span>AnchorText - URL SEO</span>
+                                                            </li>
+                                                            <li>
+                                                                <span>Backlink Indexed hay chưa?</span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon ">
+                                                                <img src=" ./img/icons/ld-icon-1.png " alt=" ">
+                                                            </span>
+                                                            <span>Tự động vượt mã Captcha Google</span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Kiểm tra Backlink không giới hạn</span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Thống kê trực quan dưới dạng biểu đồ</span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class=" sec-btn ">
+                                                    <a href=" https://seominisuite.com/user/register " class=" btn-green btn-animation ">Dùng miễn phí</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" sec-right col-xs-12 col-sm-6 col-md-6 " data-aos="fade-left" data-aos-delay="150">
+                                            <div class=" sec-img ">
+                                                <img src=" ./img/ld-img-2.png " class=" img-responsive " alt=" ">
+                                                <span class=" icon-play ">
+                                                    <img src=" ./img/icons/play.png " class=" img-responsive " alt=" ">
+                                                    <a href="#" data-toggle="modal" data-target="#BacklinkVideo"></a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class=" sec sec-2 ">
+                        <div class=" sec-container container ">
+                            <div class=" sec-inner ">
+                                <div class=" sec-content ">
+                                    <div class=" row ">
+                                        <div class=" sec-left col-xs-12 col-sm-6 col-md-6 " data-aos="fade-up">
+                                            <div class=" sec-img ">
+                                                <img src=" ./img/ld-img-3.png " class=" img-responsive " alt=" ">
+                                                <span class=" icon-play ">
+                                                    <img src=" ./img/icons/play.png " class=" img-responsive " alt=" ">
+                                                    <a href="#" data-toggle="modal" data-target="#duplicateVideo"></a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="sec-right col-xs-12 col-sm-6 col-md-6" data-aos="fade-down">
+                                            <div class="sec-left-title">
+                                                <h3 class=" heading-tertiary ">Kiểm tra đạo văn</h3>
+                                            </div>
+                                            <div class=" sec-left-content ">
+                                                <ul>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Kiểm tra đạo văn</span>
+                                                        </div>
+                                                        <ul>
+                                                            <li>
+                                                                <span>Nội dung Độc đáo/Trùng lặp</span>
+                                                            </li>
+                                                            <li>
+                                                                <span>Nguồn nội dung bị trùng lặp</span>
+                                                            </li>
+                                                            <li>
+                                                                <span>Tỷ lệ nội dung Độc đáo/Trùng lặp</span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Kiểm tra không giới hạn</span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Thống kê trực quan dưới dạng Bảng dữ liệu</span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class=" sec-btn ">
+                                                    <a href=" https://seominisuite.com/user/register " class=" btn-green btn-animation ">Dùng miễn phí</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class=" sec sec-3 ">
+                        <div class=" sec-container container ">
+                            <div class=" sec-inner ">
+                                <div class=" sec-content ">
+                                    <div class=" row ">
+                                        <div class=" sec-left col-xs-12 col-sm-6 col-md-5 " data-aos="zoom-out-up">
+                                            <div class=" sec-left-title ">
+                                                <h3 class=" heading-tertiary ">Quản lý thứ hạng từ khoá</h3>
+                                            </div>
+                                            <div class=" sec-left-content ">
+                                                <ul>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Kiểm tra Tự động Thứ hạng Từ khoá trên Google Search
+                                                                Engine</span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Kiểm tra Từ khoá Không giới hạn</span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                    alt=" "></span>
+                                                            <span>Thống kê trực quan dưới dạng Biểu đồ</span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class=" sec-btn ">
+                                                    <a href=" https://seominisuite.com/user/register " class=" btn-green btn-animation ">Dùng miễn phí</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" sec-right col-xs-12 col-sm-6 col-md-7 " data-aos=" zoom-out-down ">
+                                            <div class=" sec-img ">
+                                                <img src=" ./img/ld-img-4.png " class=" img-responsive " alt=" ">
+                                                <span class=" icon-play ">
+                                                    <img src=" ./img/icons/play.png " class=" img-responsive " alt=" ">
+                                                    <a href="#" data-toggle="modal" data-target="#KeywordVideo"></a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class=" sec sec-2 ">
+                        <div class=" sec-container container ">
+                            <div class=" sec-inner ">
+                                <div class=" sec-content ">
+                                    <div class=" row ">
+                                        <div class=" sec-left col-xs-12 col-sm-6 col-md-6 " data-aos="fade-up">
+                                            <div class=" sec-img ">
+                                                <img src=" ./img/ld-img-3.png " class=" img-responsive " alt=" ">
+                                                <span class=" icon-play ">
+                                                    <img src=" ./img/icons/play.png " class=" img-responsive " alt=" ">
+                                                    <a href="#" data-toggle="modal" data-target="#contentVideo"></a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="sec-right col-xs-12 col-sm-6 col-md-6" data-aos="fade-down">
+                                            <div class="sec-left-title">
+                                                <h3 class=" heading-tertiary ">Hỗ trợ Outline Content</h3>
+                                            </div>
+                                            <div class=" sec-left-content ">
+                                                <ul>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                                      alt=" "></span>
+                                                            <span>Hỗ trợ lên dàn ý viết bài chuẩn SEO</span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                                      alt=" "></span>
+                                                            <span>Xây dựng tiêu chí viết bài để đạt yêu cầu lọt TOP 10</span>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <span class=" icon "><img src=" ./img/icons/ld-icon-1.png "
+                                                                                      alt=" "></span>
+                                                            <span>Dữ liệu được tổng hợp từ 10 đối thủ có thứ hạng cao nhất</span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class=" sec-btn ">
+                                                    <a href=" https://seominisuite.com/user/register " class=" btn-green btn-animation ">Dùng miễn phí</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class=" sec sec-4 ">
+                        <div class=" sec-container container ">
+                            <div class=" sec-inner ">
+                                <div class=" sec-title mb-30 ">
+                                    <h2 class=" heading-secondary " data-aos="fade-up">Phản hồi của khách hàng</h2>
+                                </div>
+                                <div class=" sec-content ">
+                                    <div class=" img-comment ">
+                                        <div class=" swiper Comment-slider ">
+                                            <div class=" swiper-wrapper ">
+                                                <div class=" swiper-slide " data-aos="zoom-out" data-aos-delay="150">
+                                                    <img src=" ./img/comment-1.webp " class=" img-responsive " alt=" ">
+                                                </div>
+                                                <div class=" swiper-slide " data-aos="zoom-out" data-aos-delay="180">
+                                                    <img src=" ./img/comment-2.webp " class=" img-responsive " alt=" ">
+                                                </div>
+                                                <div class=" swiper-slide " data-aos="zoom-out" data-aos-delay="210">
+                                                    <img src=" ./img/comment-5.webp " class=" img-responsive " alt=" ">
+                                                </div>
+                                                <div class=" swiper-slide " data-aos="zoom-out" data-aos-delay="240">
+                                                    <img src=" ./img/comment-3.webp " class=" img-responsive " alt=" ">
+                                                </div>
+                                                <div class=" swiper-slide " data-aos="zoom-out" data-aos-delay="270">
+                                                    <img src=" ./img/comment-4.webp " class=" img-responsive " alt=" ">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" swiper-button-next "></div>
+                                        <div class=" swiper-button-prev "></div>
+                                        <div class=" swiper-pagination "></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class=" sec sec-5 ">
+                        <div class=" sec-container container ">
+                            <div class=" sec-inner ">
+                                <div class=" sec-title mb-30 ">
+                                    <h2 class=" heading-secondary " data-aos="fade-up">Câu hỏi thường gặp</h2>
+                                </div>
+                                <div class=" sec-content ">
+                                    <div class=" row ">
+                                        <div class="col-xs-12 col-sm-6 col-md-6 ">
+                                            <div class=" box-quest " data-aos="fade-up" data-aos-delay="50">
+                                                <div class=" box-quest-title ">
+                                                    <span class=" icon "><img src=" ./img/icons/ld-icon-2.png "
+                                                            alt=" "></span>
+                                                    <span>Phần mềm có hỏi mã Captcha, hay phải mua thêm dịch vụ ngoài,
+                                                        như những phần mềm khác (chẳng hạn, Spi*Edit**) ?
+                                                    </span>
+                                                </div>
+                                                <div class=" box-quest-content ">
+                                                    <p>
+                                                        Phần mềm SEO MiniSuite tích hợp AI (Trí tuệ nhân tạo), tự động nhận diện và giải mã Captcha Google. Khả năng giải mã với Captcha có độ khó rất cao, Tỷ lệ thành công đạt 97,3%.
+                                                    </p>
+                                                    <p>
+                                                        Người dùng không phải nhập mã Captcha thủ công, gây phiền toái mệt mỏi như khi sử dụng phần mềm Spi*Edit**
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 " data-aos="fade-up" data-aos-delay="100">
+                                            <div class=" box-quest ">
+                                                <div class=" box-quest-title ">
+                                                    <span class=" icon "><img src=" ./img/icons/ld-icon-2.png "
+                                                            alt=" "></span>
+                                                    <span>
+                                                        Phần mềm miễn phí, lấy kinh phí đâu để duy trì & phát triển lâu
+                                                        dài?
+                                                    </span>
+                                                </div>
+                                                <div class=" box-quest-content ">
+                                                    <p>
+                                                        SEO MiniSuite, phần mềm do đội ngũ ClickOn Digital phát triển. Công ty chuyên tư vấn & triển khai chiến dịch SEO Google Marketing dựa trên nền tảng website: Tối ưu website chuẩn SEO Digital, Dịch vụ Backlink và tư vấn SEO.
+                                                    </p>
+                                                    <p>
+                                                        Bạn có thể ủng hộ dịch vụ trả phí khác tại ClickOn Digital, giúp có thêm kinh phí để phát triển Phần mềm SEO MiniSuite hiệu quả & lâu dài.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 " data-aos="fade-up" data-aos-delay="150">
+                                            <div class=" box-quest border-top ">
+                                                <div class=" box-quest-title ">
+                                                    <span class=" icon "><img src=" ./img/icons/ld-icon-2.png "
+                                                            alt=" "></span>
+                                                    <span>Dùng bản miễn phí có tốt không?</span>
+                                                </div>
+                                                <div class=" box-quest-content ">
+                                                    <p>
+                                                        Hiện tại, phần mềm SEO MiniSuite đang hỗ trợ hoàn toàn miễn phí & không giới hạn tính năng.
+                                                    </p>
+                                                    <p>
+                                                        Trong tương lai, đội ngũ SEO MiniSuite vẫn sẽ duy trì Tính năng miễn phí, hỗ trợ SEO”er” triển khai dự án hiệu quả & tiết kiệm thời gian hơn.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 " data-aos="fade-up" data-aos-delay="200">
+                                            <div class=" box-quest border-top ">
+                                                <div class=" box-quest-title ">
+                                                    <span class=" icon "><img src=" ./img/icons/ld-icon-2.png "
+                                                            alt=" "></span>
+                                                    <span>Tại sao phải quản lý Backlink?</span>
+                                                </div>
+                                                <div class=" box-quest-content ">
+                                                    <p>
+                                                        Backlink luôn là yếu tố khó quản lý nhất trong quá trình làm SEO.
+                                                    </p>
+                                                    <p>
+                                                        Quản lý Backlink giúp bạn phòng ngừa việc từ khoá lên Top Không đúng tiến độ, dính tác vụ Backlink Không tự nhiên hoặc thậm trí thuật toán Google Penguin
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <section class=" sec sec-6 ">
+                        <div class=" sec-container container ">
+                            <div class=" sec-inner ">
+                                <div class=" sec-content ">
+                                    <div class=" row ">
+                                        <div class=" col-xs-12 col-sm-12 col-md-5 " data-aos="fade-right">
+                                            <div class=" sec-left ">
+                                                <div class=" img ">
+                                                    <img src=" ./img/ld-img-6.png " class=" img-responsive " alt=" ">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class=" col-xs-12 col-sm-12 col-md-7 " data-aos="fade-left">
+                                            <div class=" sec-right ">
+                                                <h2>Thời gian tối thiểu, hiệu quả tối đa <br> với tính năng SEO không giới hạn</h2>
+                                                <span>" Quản lý Backlink, Quản lý Thứ hạng Từ khoá, Kiểm tra Đạo văn, Hỗ trợ Outline Content
+                                                </span> <a href="https://seominisuite.com/user" class="btn-white">Dùng
+                                                    miễn phí</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class=" footer ">
+        <div class=" footer-contaienr container ">
+            <div class=" footer-inner ">
+                <div class=" footer-item about ">
+                    <div class=" footer-logo ">
+                        <a href=" ./index.html "><img src=" ./img/logo.png " alt=" "></a>
+                    </div>
+                    <p>
+                        SEO MiniSuite - Tiết kiệm 50% thời gian Quản lý SEO với tính năng không giới hạn: Quản lý Backlink, Quản lý Thứ hạng Từ khoá, Kiểm tra Đạo văn & Hỗ trợ Outline Content
+                    </p>
+                </div>
+
+                <div class=" footer-item quicklinks ">
+                    <h2 class=" footer-title ">Hỗ trợ khách hàng</h2>
+                    <ul>
+                        <li>
+                            <a href=" # " data-toggle="modal" data-target="#PriceModal">Hướng dẫn thanh toán</a>
+                        </li>
+                        <li>
+                            <a href=" # ">Chính sách hỗ trợ</a>
+                        </li>
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#PolicyModal">Chính sách bảo mật thông tin</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class=" footer-item contact ">
+                    <h2 class=" footer-title ">Thông tin liên hệ</h2>
+                    <div>
+                        <p>
+                            <span>Công Ty TNHH An Đức Tâm</span>
+                        </p>
+                        <p>
+                            <span>Giấy chứng nhận đăng ký kinh doanh số: 0109893400</span>
+                        </p>
+                        <p>
+                            <span>Nơi cấp: Sở kế hoạch và Đầu tư thành phố Hà Nội</span>
+                        </p>
+                        <p>
+                            <span>Cấp ngày: 20/01/2022</span>
+                        </p>
+                    </div>
+                    <ul class=" info ">
+                        <li>
+                            <span class=" icon ">Địa chỉ: </span>
+                            <span>Tầng 6, số 88 Tô Vĩnh Diện,Thanh Xuân, Khương Trung, Hà Nội</span>
+                        </li>
+                        <li>
+                            <span class=" icon ">Hotline:</span>
+                            <a href=" tel:0865621196 ">0865621196</a>
+                        </li>
+                        <li>
+                            <span class=" icon ">Email</span>
+                            <a href=" mailto:saleadmin@clickon.vn">saleadmin@clickon.vn</a>
+                        </li>
+                    </ul>
+                    <div class=" d-flex ">
+                        <ul class=" sci ">
+                            <li>
+                                <a href=" # "><i class=" fa fa-facebook " aria-hidden=" true "></i></a>
+                            </li>
+                            <li>
+                                <a href=" # "><i class=" fa fa-twitter " aria-hidden=" true "></i></a>
+                            </li>
+                            <li>
+                                <a href=" # "><i class=" fa fa-instagram " aria-hidden=" true "></i></a>
+                            </li>
+                            <li>
+                                <a href=" # "><i class=" fa fa-youtube-play " aria-hidden=" true "></i></a>
+                            </li>
+                        </ul>
+                        <div class=" footer-policy">
+                            <a href="http://online.gov.vn/Home/WebDetails/88088?AspxAutoDetectCookieSupport=1"><img src=" ./img/img-7.png " alt=" "></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class=" copy-right ">
+        <p>&copy; 2021 All rights reserved.</p>
+    </div>
+    <!-- back to top -->
+    <div class="back-to-top">
+        <span class="icon"><i class="fa fa-angle-double-up" aria-hidden="true"></i></span>
+    </div>
+    <!-- back to top -->
+    <!-- Modal Policy -->
+    <div class="modal fade" id="PolicyModal" tabindex="-1" role="dialog" aria-labelledby="PolicyModal" aria-hidden="true">
+        <div class="modal-dialog policyModal" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class=" page-policy ">
+                        <div class=" page-policy-container ">
+                            <div class=" page-policy-inner ">
+                                <h1>I. CHÍNH SÁCH BẢO MẬT THÔNG TIN:</h1>
+                                <h2>1. Mục đích thu thập thông tin cá nhân</h2>
+                                <p>
+                                    Mục đích của việc thu thập thông tin khách hàng nhằm liên quan đến các vấn đề như:
+                                    <p>– Hỗ trợ khách hàng: tư vấn các dịch vụ của chúng tôi.</p>
+                                    <p>– Cung cấp thông tin các dịch vụ và hỗ trợ theo yêu cầu của khách hàng.</p>
+                                    <p>– Gửi thông báo các chương trình, dịch vụ mới nhất của chúng tôi.</p>
+                                    <p>– Giải quyết vấn đề phát sinh khi sử dụng dịch vụ.</p>
+                                    <p>– Ngăn chặn các hoạt động phạm pháp.</p>
+                                    <p>– Đo lường và cải thiện các dịch vụ của chúng tôi.</p>
+                                </p>
+                                <h2>2. Phạm vi thu thập thông tin</h2>
+                                <p>
+                                    <p>– Khách hàng trực tiếp cung cấp: Khách hàng trực tiếp cung cấp bao gồm: họ tên, địa chỉ email, số điện thoại, địa chỉ.</p>
+                                    <p> – Khách hàng tương tác với chúng tôi: Chúng tôi sử dụng cookies và công nghệ theo dấu khác để thu thập một số thông tin khi khách hàng tương tác trên website https://seominisuite.com/
+                                    </p>
+                                    <p>– Từ những nguồn hợp pháp khác: Chúng tôi thu thập thông tin khách hàng từ các nguồn hợp pháp khác.</p>
+                                </p>
+                                <h2>3. Thời gian lưu trữ thông tin</h2>
+                                <p>
+                                    CÔNG TY CỔ PHẦN GIẢI PHÁP VÀ CÔNG NGHỆ ALUSOFT VIỆT NAM sẽ lưu trữ các thông tin cá nhân do khách hàng cung cấp trên các hệ thống nội bộ của chúng tôi trong quá trình cung cấp dịch vụ cho khách hàng hoặc khi khách hàng có yêu cầu hủy thông tin đã cấp.
+                                </p>
+                                <h2>4. Những người hoặc tổ chức có thể được tiếp cận với thông tin đó</h2>
+                                <p>
+                                    <p>
+                                        – Các đối tác là bên cung cấp dịch vụ cho chúng tôi liên quan đến thực hiện đơn hàng và chỉ giới hạn trong phạm vi thông tin cần thiết cũng như áp dụng các quy định đảm bảo an ninh, bảo mật các thông tin cá nhân.
+                                    </p>
+                                    <p>
+                                        – Chúng tôi sử dụng dịch vụ từ một nhà cung cấp dịch vụ là bên thứ ba để thực hiện một số hoạt động liên quan đến website https://seominisuite.com/. Khi đó, bên thứ ba có thể truy cập hoặc xử lý các thông tin cá nhân trong quá trình cung cấp các dịch
+                                        vụ đó. Chúng tôi yêu cầu các bên thứ ba này tuân thủ mọi luật lệ về bảo vệ thông tin cá nhân liên quan và các yêu cầu về an ninh liên quan đến thông tin cá nhân.
+                                    </p>
+                                    <p>
+                                        – Các chương trình có tính liên kết, đồng thực hiện, thuê ngoài cho các mục đích được nêu tại Mục 1 và luôn áp dụng các yêu cầu bảo mật thông tin cá nhân.
+                                    </p>
+                                    <p>
+                                        – Yêu cầu pháp lý: Chúng tôi có thể tiết lộ các thông tin cá nhân nếu điều đó do luật pháp yêu cầu và việc tiết lộ như vậy là cần thiết một cách hợp lý để tuân thủ các quy trình pháp lý.
+                                    </p>
+                                    <p>
+                                        – Chuyển giao kinh doanh (nếu có): trong trường hợp sáp nhập, hợp nhất toàn bộ hoặc một phần với công ty khác, người mua sẽ có quyền truy cập thông tin được chúng tôi lưu trữ, duy trì trong đó bao gồm cả thông tin cá nhân.
+                                    </p>
+                                </p>
+                                <h2>5. Địa chỉ của đơn vị thu thập và quản lý thông tin</h2>
+                                <p>
+                                    <p>– Tên doanh nghiệp: Công Ty TNHH An Đức Tâm</p>
+                                    <p>– Thành lập và hoạt động theo Giấy chứng nhận đăng ký doanh nghiệp số: 0109893400 do Sở kế hoạch và Đầu tư thành phố Hà Nội cấp ngày 20/01/2022</p>
+                                    <!-- <p>– Trụ sở chính: Số nhà 3, ngách 11/8 đường Bến Chằm, tổ 1, Phường Đồng Mai, Quận Hà Đông, Hà Nội</p> -->
+                                    <p>– Địa chỉ: Tầng 6, số 88 Tô Vĩnh Diện,Thanh Xuân, Khương Trung, Hà Nội </p>
+                                </p>
+                                <h2>6. Phương thức và công cụ để người dùng tiếp cận và chỉnh sửa dữ liệu:</h2>
+                                <p>
+                                    <p>Nếu quý khách có bất cứ về yêu cầu nào về việc tiếp cận và chỉnh sửa thông tin cá nhân đã cung cấp, quý khách có thể:</p>
+                                    <p>– Gọi điện trực tiếp về số điện thoại: (+84) 931 89 0596</p>
+                                    <p>– Gửi mail: saleadmin@clickon.vn</p>
+                                </p>
+                                <h1>II. CHÍNH SÁCH THANH TOÁN:</h1>
+                                <p>
+                                    <p>- Thanh toán bằng tiền mặt: thanh toán trực tiếp tại công ty.</p>
+                                    <p>- Thanh toán bằng hình thức chuyển khoản: </p>
+                                    <p>Chủ tài khoản: Công ty cổ phần giải pháp và công nghệ Alusoft Việt Nam</p>
+                                    <p>Số tài khoản: 020086395968</p>
+                                    <p>Ngân hàng: Sacombank – CN Đông Đô</p>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Policy -->
+
+    <!-- Modal Policy -->
+    <div class="modal fade" id="PriceModal" tabindex="-1" role="dialog" aria-labelledby="PriceModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="checkout-guide-wrapper">
+                        <h4 class="text-center fw-500 checkout-guide-title fz-18 lh-23">
+                            Bạn có thể thanh toán bằng hình thức chuyển khoản ngân hàng<br> qua các thông tin dưới đây
+                        </h4>
+                        <div class="checkout-list-item">
+                            <div class="checkout-item">
+                                <div class="checkout-logo">
+                                    <img width="590" height="225" src="./img/Techcombank.png" alt="" class="img-responsive">
+                                </div>
+                                <div class="checkout-content bg-gray">
+                                    <h4 class="checkout-content-name fz-14 lh-20">Ngân hàng Thương mại cổ phần Kỹ Thương Việt Nam</h4>
+                                    <div class="checkout-content-detail fz-14 lh-20">
+                                        <p>Chủ tài khoản: Công ty trách nhiệm hữu hạn An Đức Tâm</p>
+                                        <p>Ngân hàng: Techcombank – Chi nhánh Định Công</p>
+                                        <p>Mã số tài khoản: <span class="c-red">19038167340669</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Policy -->
+
+    <!-- Modal Video -->
+    <div class="modal fade" id="VideoModal" tabindex="-1" role="dialog" aria-labelledby="VideoModal" aria-hidden="true">
+        <div class="modal-dialog videoModal" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="video-modal-content">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/pHPj8ElJChA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Video -->
+    <!-- Modal Video Backlink -->
+    <div class="modal fade" id="BacklinkVideo" tabindex="-1" role="dialog" aria-labelledby="BacklinkVideo" aria-hidden="true">
+        <div class="modal-dialog videoModal" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="video-modal-content">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/q_OoUIzL1Bo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Video Backlink -->
+    <!-- Modal Video Keyword -->
+    <div class="modal fade" id="KeywordVideo" tabindex="-1" role="dialog" aria-labelledby="KeywordVideo" aria-hidden="true">
+        <div class="modal-dialog videoModal" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="video-modal-content">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/bWYdpZox-BM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Video Keyword -->
+    <!-- Modal Video duplicate -->
+    <div class="modal fade" id="duplicateVideo" tabindex="-1" role="dialog" aria-labelledby="duplicateVideo" aria-hidden="true">
+        <div class="modal-dialog videoModal" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="video-modal-content">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/QHJWkWo-NCk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Video duplicate -->
+    <!-- Modal Video duplicate -->
+    <div class="modal fade" id="contentVideo" tabindex="-1" role="dialog" aria-labelledby="duplicateVideo" aria-hidden="true">
+        <div class="modal-dialog videoModal" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="video-modal-content">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/LQXdMQQlMeE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Video duplicate -->
+    <!-- ADD JAVSCRIPT METU -->
+    <script defer src=" https://menu.metu.vn/static/js/sdk.js?container=body "></script>
+    <script>
+        window.MBID = " x8GTooMsw ";
+    </script>
+    <!-- ADD JAVSCRIPT METU -->
+    <script src=" https://code.jquery.com/jquery-2.2.4.min.js "></script>
+    <script src=" https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js "></script>
+    <script src=" https://unpkg.com/swiper/swiper-bundle.min.js "></script>
+    <script src=" https://unpkg.com/aos@next/dist/aos.js "></script>
+    <script src=" ./js/app.js "></script>
+</body>
+
+</html>
