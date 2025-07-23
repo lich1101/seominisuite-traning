@@ -136,6 +136,14 @@ $stt = 1;
            href="/quan-ly-backlink/du-an/<?php echo($project->nid); ?>/bao-cao">Báo
           cáo</a>
       </li>
+       <!-- Dòng nhập số để chọn khoảng checkbox -->
+       <li class="row-range-select">
+                  <div style="display: flex; align-items: center; gap: 4px; margin-left: 10px;">
+                    <input type="number" min="1" id="inlineRangeFrom" class="form-control input-sm" style="width: 160px;" placeholder="Từ STT">
+                    <input type="number" min="1" id="inlineRangeTo" class="form-control input-sm" style="width: 160px;" placeholder="Đến STT">
+                    <button type="button" class="btn btn-xs btn-success" id="inlineApplyRange" style="font-size: 12px; padding: 2px 8px;">Chọn khoảng</button>
+                  </div>
+    </li>
     </ul>
     <div class="page-search df-tabs-search">
       <div class="input-group-search">

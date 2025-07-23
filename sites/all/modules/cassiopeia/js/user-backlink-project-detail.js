@@ -816,6 +816,78 @@ function getDomainFromHref(href) {
       }
     });
 
+    // Chọn khoảng checkbox
+    $(".select-range-btn").click(function (e) {
+      e.preventDefault();
+      var totalRows = $("tbody tr").length;
+      $("#currentTotal").text(totalRows);
+      $("#rangeFrom").val(1);
+      $("#rangeTo").val(totalRows);
+      $("#modalSelectRange").modal("show");
+    });
+
+    // Áp dụng chọn khoảng
+    $("#applyRange").click(function (e) {
+      applyRangeSelection();
+    });
+
+    // Hàm áp dụng chọn khoảng
+    function applyRangeSelection() {
+      var from = parseInt($("#rangeFrom").val());
+      var to = parseInt($("#rangeTo").val());
+      var totalRows = $("tbody tr").length;
+
+      // Validate input
+      if (isNaN(from) || isNaN(to)) {
+        alert("Vui lòng nhập số hợp lệ!");
+        return;
+      }
+
+      if (from < 1 || to < 1) {
+        alert("STT phải lớn hơn 0!");
+        return;
+      }
+
+      if (from > totalRows || to > totalRows) {
+        alert("STT không được vượt quá tổng số bản ghi (" + totalRows + ")!");
+        return;
+      }
+
+      if (from > to) {
+        alert("STT bắt đầu không được lớn hơn STT kết thúc!");
+        return;
+      }
+
+      // Bỏ chọn tất cả trước
+      $("tbody input[type='checkbox']").prop("checked", false);
+      $(".selectAll").prop("checked", false);
+
+      // Chọn khoảng
+      var selectedCount = 0;
+      $("tbody tr").each(function(index) {
+        var stt = index + 1;
+        if (stt >= from && stt <= to) {
+          $(this).find("input[type='checkbox']").prop("checked", true);
+          selectedCount++;
+        }
+      });
+
+      // Hiển thị thông báo
+      if (selectedCount > 0) {
+        // alert("Đã chọn " + selectedCount + " bản ghi từ STT " + from + " đến STT " + to);
+      }
+
+      // Đóng modal
+      $("#modalSelectRange").modal("hide");
+    }
+
+    // Phím tắt Enter để áp dụng
+    $("#modalSelectRange input").keypress(function(e) {
+      if (e.which == 13) { // Enter key
+        applyRangeSelection();
+      }
+    });
+
     $(".btn-add-backlink").click(function (e) {
       modalAddBacklink.modal("show");
       modalAddBacklink.css("display", "flex");
@@ -1125,6 +1197,51 @@ function getDomainFromHref(href) {
         $(this).parents('tr').addClass('selected');
       }else{
         $(this).parents('tr').removeClass('selected');
+      }
+    });
+
+    // Xử lý chọn khoảng trực tiếp trên bảng
+    $("#inlineApplyRange").click(function () {
+      var from = parseInt($("#inlineRangeFrom").val());
+      var to = parseInt($("#inlineRangeTo").val());
+      var totalRows = $("tbody tr").length;
+
+      if (isNaN(from) || isNaN(to)) {
+        alert("Vui lòng nhập số hợp lệ!");
+        return;
+      }
+      if (from < 1 || to < 1) {
+        alert("STT phải lớn hơn 0!");
+        return;
+      }
+      if (from > totalRows || to > totalRows) {
+        alert("STT không được vượt quá tổng số bản ghi (" + totalRows + ")!");
+        return;
+      }
+      if (from > to) {
+        alert("STT bắt đầu không được lớn hơn STT kết thúc!");
+        return;
+      }
+      // Bỏ chọn tất cả trước
+      $("tbody input[type='checkbox']").prop("checked", false);
+      $(".selectAll").prop("checked", false);
+      // Chọn khoảng
+      var selectedCount = 0;
+      $("tbody tr").each(function(index) {
+        var stt = index + 1;
+        if (stt >= from && stt <= to) {
+          $(this).find("input[type='checkbox']").prop("checked", true);
+          selectedCount++;
+        }
+      });
+      if (selectedCount > 0) {
+        // alert("Đã chọn " + selectedCount + " bản ghi từ STT " + from + " đến STT " + to);
+      }
+    });
+    // Hỗ trợ phím Enter cho input
+    $("#inlineRangeFrom, #inlineRangeTo").keypress(function(e) {
+      if (e.which == 13) {
+        $("#inlineApplyRange").click();
       }
     });
   });
