@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extension Debug Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+        .warning { color: orange; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Extension Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>📋 Script Analysis</h2>
+        <div id="script-analysis"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🔧 Function Detection</h2>
+        <div id="function-detection"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🚫 CSP Violations</h2>
+        <div id="csp-violations"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>📜 External Scripts</h2>
+        <div id="external-scripts"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🎯 Captcha Elements</h2>
+        <div id="captcha-elements"></div>
+    </div>
+
+    <script>
+        // Debug function
+        function debugInfo() {
+            console.log('🔍 Starting debug analysis...');
+            
+            // 1. Script Analysis
+            const scriptAnalysis = document.getElementById('script-analysis');
+            const scripts = document.querySelectorAll('script');
+            let scriptHtml = '<h3>Loaded Scripts:</h3><ul>';
+            
+            scripts.forEach((script, index) => {
+                const src = script.src || 'inline';
+                const content = script.textContent ? script.textContent.substring(0, 100) + '...' : 'no content';
+                scriptHtml += `<li><strong>${index + 1}.</strong> ${src}</li>`;
+                if (script.src) {
+                    scriptHtml += `<li class="warning">⚠️ External script: ${script.src}</li>`;
+                }
+            });
+            scriptHtml += '</ul>';
+            scriptAnalysis.innerHTML = scriptHtml;
+            
+            // 2. Function Detection
+            const functionDetection = document.getElementById('function-detection');
+            let functionHtml = '<h3>Global Functions:</h3><ul>';
+            
+            const suspiciousFunctions = ['solveSimpleChallenge', 'solveCaptcha', 'recaptcha', 'captcha'];
+            suspiciousFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    functionHtml += `<li class="error">❌ Found: ${funcName}</li>`;
+                    try {
+                        const funcSource = window[funcName].toString();
+                        functionHtml += `<li><pre>${funcSource.substring(0, 200)}...</pre></li>`;
+                    } catch (e) {
+                        functionHtml += `<li>Cannot read function source</li>`;
+                    }
+                } else {
+                    functionHtml += `<li class="success">✅ Not found: ${funcName}</li>`;
+                }
+            });
+            functionHtml += '</ul>';
+            functionDetection.innerHTML = functionHtml;
+            
+            // 3. CSP Violations
+            const cspViolations = document.getElementById('csp-violations');
+            let cspHtml = '<h3>CSP Status:</h3>';
+            
+            // Override console.error to catch CSP violations
+            const originalError = console.error;
+            const violations = [];
+            console.error = function(...args) {
+                if (args[0] && typeof args[0] === 'string' && args[0].includes('Content Security Policy')) {
+                    violations.push(args.join(' '));
+                }
+                originalError.apply(console, args);
+            };
+            
+            // Trigger some potential CSP violations
+            setTimeout(() => {
+                if (violations.length > 0) {
+                    cspHtml += '<ul>';
+                    violations.forEach(violation => {
+                        cspHtml += `<li class="error">🚫 ${violation}</li>`;
+                    });
+                    cspHtml += '</ul>';
+                } else {
+                    cspHtml += '<p class="success">✅ No CSP violations detected</p>';
+                }
+                cspViolations.innerHTML = cspHtml;
+            }, 1000);
+            
+            // 4. External Scripts
+            const externalScripts = document.getElementById('external-scripts');
+            let externalHtml = '<h3>External Scripts:</h3><ul>';
+            
+            const externalScriptTags = document.querySelectorAll('script[src]');
+            externalScriptTags.forEach(script => {
+                externalHtml += `<li>${script.src}</li>`;
+                if (script.src.includes('captcha') || script.src.includes('recaptcha')) {
+                    externalHtml += `<li class="warning">⚠️ Potential captcha script: ${script.src}</li>`;
+                }
+            });
+            externalHtml += '</ul>';
+            externalScripts.innerHTML = externalHtml;
+            
+            // 5. Captcha Elements
+            const captchaElements = document.getElementById('captcha-elements');
+            let captchaHtml = '<h3>Captcha Elements:</h3><ul>';
+            
+            const recaptchaDivs = document.querySelectorAll('.g-recaptcha, [data-sitekey]');
+            recaptchaDivs.forEach(div => {
+                captchaHtml += `<li>Found recaptcha element: ${div.outerHTML.substring(0, 100)}...</li>`;
+                const sitekey = div.getAttribute('data-sitekey');
+                if (sitekey) {
+                    captchaHtml += `<li class="warning">⚠️ Sitekey: ${sitekey}</li>`;
+                }
+            });
+            
+            const textareas = document.querySelectorAll('#g-recaptcha-response');
+            textareas.forEach(textarea => {
+                captchaHtml += `<li>Found response textarea: ${textarea.outerHTML}</li>`;
+            });
+            
+            captchaHtml += '</ul>';
+            captchaElements.innerHTML = captchaHtml;
+        }
+        
+        // Run debug when page loads
+        window.addEventListener('load', debugInfo);
+        
+        // Also run after a delay to catch late-loaded scripts
+        setTimeout(debugInfo, 2000);
+        
+        // Monitor for new scripts being added
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.tagName === 'SCRIPT') {
+                            console.log('🆕 New script detected:', node.src || 'inline');
+                            debugInfo();
+                        }
+                    });
+                }
+            });
+        });
+        
+        observer.observe(document.head, { childList: true });
+        observer.observe(document.body, { childList: true });
+    </script>
+</body>
+</html> 

@@ -665,3 +665,6 @@ error_reporting(E_ALL);
      ini_set('display_errors', TRUE);
      ini_set('display_startup_errors', TRUE);
      $conf['error_level'] = 2; // Show all messages
+
+// Fix temporary file path
+$conf['file_temporary_path'] = 'sites/default/files/tmp';

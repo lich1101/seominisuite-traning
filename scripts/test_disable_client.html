@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Disable Client Scripts</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        #log { background: #f5f5f5; padding: 10px; border-radius: 3px; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Disable Client Scripts</h1>
+    
+    <div class="test-section">
+        <h2>📋 Test Controls</h2>
+        <button onclick="loadDisableScript()">Load Disable Script</button>
+        <button onclick="testSolveSimpleChallenge()">Test solveSimpleChallenge</button>
+        <button onclick="testCaptchaAPI()">Test Captcha API Call</button>
+        <button onclick="testScriptInjection()">Test Script Injection</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📝 Log Output</h2>
+        <div id="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎯 Captcha Test Form</h2>
+        <form id="captcha-form">
+            <div class="g-recaptcha" data-sitekey="6Le-wvkSAAAAAPBMRTvw0Q4Muexq9bi0DJwx_mJ-"></div>
+            <br>
+            <button type="submit">Submit Form</button>
+        </form>
+    </div>
+
+    <script>
+        // Log function
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+            logDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // Load disable script
+        function loadDisableScript() {
+            log('Loading disable script...', 'info');
+            const script = document.createElement('script');
+            script.src = 'disable_client_scripts.js';
+            script.onload = function() {
+                log('Disable script loaded successfully', 'success');
+            };
+            script.onerror = function() {
+                log('Failed to load disable script', 'error');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Test solveSimpleChallenge
+        function testSolveSimpleChallenge() {
+            log('Testing solveSimpleChallenge...', 'info');
+            
+            // Create a fake solveSimpleChallenge function
+            window.solveSimpleChallenge = function(sitekey, data_s, url) {
+                log('Client-side solveSimpleChallenge called (should be blocked)', 'warning');
+                return 'fake-token';
+            };
+            
+            // Try to call it
+            const result = window.solveSimpleChallenge('test-sitekey', 'test-data-s', 'test-url');
+            log(`Result: ${result}`, result === null ? 'success' : 'error');
+        }
+        
+        // Test captcha API call
+        function testCaptchaAPI() {
+            log('Testing captcha API call...', 'info');
+            
+            fetch('https://2captcha.com/in.php', {
+                method: 'POST',
+                body: 'test-data'
+            })
+            .then(response => response.json())
+            .then(data => {
+                log('API call succeeded (should be blocked)', 'error');
+            })
+            .catch(error => {
+                log('API call blocked successfully', 'success');
+            });
+        }
+        
+        // Test script injection
+        function testScriptInjection() {
+            log('Testing script injection...', 'info');
+            
+            const script = document.createElement('script');
+            script.src = 'https://www.google.com/recaptcha/api.js';
+            script.onload = function() {
+                log('Script loaded (should be blocked)', 'error');
+            };
+            script.onerror = function() {
+                log('Script blocked successfully', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Clear log
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        // Form submit handler
+        document.getElementById('captcha-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            log('Form submitted - checking for client-side captcha solving...', 'info');
+            
+            // Check if any captcha solving functions exist
+            const captchaFunctions = ['solveSimpleChallenge', 'solveCaptcha', 'solveRecaptcha'];
+            captchaFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    log(`Found ${funcName} function`, 'warning');
+                } else {
+                    log(`No ${funcName} function found`, 'success');
+                }
+            });
+        });
+        
+        // Monitor console for CSP violations
+        const originalError = console.error;
+        console.error = function(...args) {
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('Content Security Policy')) {
+                log('CSP Violation detected: ' + args.join(' '), 'warning');
+            }
+            originalError.apply(console, args);
+        };
+        
+        // Initial log
+        log('Test page loaded. Click "Load Disable Script" to start testing.', 'info');
+    </script>
+    
+    <!-- Load reCAPTCHA script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</body>
+</html> 

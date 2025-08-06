@@ -1,0 +1,16 @@
+{
+  "name": "puppeteer-2captcha",
+  "version": "1.0.0",
+  "description": "Puppeteer script for solving reCAPTCHA with 2Captcha",
+  "main": "puppeteer_2captcha.js",
+  "scripts": {
+    "start": "node puppeteer_2captcha.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "node-fetch": "^2.6.7"
+  },
+  "keywords": ["puppeteer", "2captcha", "recaptcha", "automation"],
+  "author": "Seominisuite",
+  "license": "MIT"
+}
