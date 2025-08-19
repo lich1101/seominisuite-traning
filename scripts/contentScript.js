@@ -1237,6 +1237,137 @@ function cassiopeia_recursion_check_content(currentObj, responseObject = 1) {
     }
 }
 
+// Lưu trữ dữ liệu kiểm tra đạo văn
+function saveDuplicateCheckData() {
+    let duplicateData = {
+        timestamp: new Date().getTime(),
+        content: tinyMCE.activeEditor ? tinyMCE.activeEditor.getContent() : '',
+        results: {}
+    };
+    
+    // Lưu kết quả từng câu
+    $('.duplicate-content-check .duplicate-content-table tbody tr').each(function() {
+        let $row = $(this);
+        let id = $row.find('td[data-id]').attr('data-id');
+        if (id) {
+            let query = $row.find('td[data-id]').text().trim();
+            let sources = $row.find('.sources').html();
+            let result = $row.find('.check-result').attr('data-duplicate');
+            let resultValue = $row.find('.check-result').attr('data-value');
+            
+            duplicateData.results[id] = {
+                query: query,
+                sources: sources,
+                result: result,
+                resultValue: resultValue
+            };
+        }
+    });
+    
+    // Lưu tổng kết
+    let noneDuplicate = $('.duplicate-content-check .total-result span.none-duplicate').text();
+    let duplicate = $('.duplicate-content-check .total-result span.duplicate').text();
+    duplicateData.summary = {
+        noneDuplicate: noneDuplicate,
+        duplicate: duplicate
+    };
+    
+    // Lưu vào localStorage
+    localStorage.setItem('guest_post_duplicate_check_data', JSON.stringify(duplicateData));
+}
+
+// Khôi phục dữ liệu kiểm tra đạo văn
+function restoreDuplicateCheckData() {
+    let savedData = localStorage.getItem('guest_post_duplicate_check_data');
+    if (savedData) {
+        try {
+            let duplicateData = JSON.parse(savedData);
+            
+            // Kiểm tra xem dữ liệu có còn hợp lệ không (trong vòng 1 giờ)
+            let now = new Date().getTime();
+            if (now - duplicateData.timestamp > 3600000) { // 1 giờ
+                localStorage.removeItem('guest_post_duplicate_check_data');
+                return false;
+            }
+            
+            // Khôi phục nội dung
+            if (duplicateData.content && tinyMCE.activeEditor) {
+                tinyMCE.activeEditor.setContent(duplicateData.content);
+            }
+            
+            // Khôi phục kết quả
+            if (duplicateData.results) {
+                Object.keys(duplicateData.results).forEach(function(id) {
+                    let result = duplicateData.results[id];
+                    let $row = $('.duplicate-content-check .duplicate-content-table tbody tr').find('td[data-id="' + id + '"]').closest('tr');
+                    if ($row.length) {
+                        $row.find('.sources').html(result.sources);
+                        $row.find('.check-result').attr('data-duplicate', result.result);
+                        $row.find('.check-result').attr('data-value', result.resultValue);
+                        
+                        // Khôi phục icon
+                        if (result.result === 'true') {
+                            $row.find('.check-result').html('<i class="fa fa-times"></i>');
+                        } else {
+                            $row.find('.check-result').html('<i class="fa fa-check"></i>');
+                        }
+                    }
+                });
+            }
+            
+            // Khôi phục tổng kết
+            if (duplicateData.summary) {
+                $('.duplicate-content-check .total-result span.none-duplicate').text(duplicateData.summary.noneDuplicate);
+                $('.duplicate-content-check .total-result span.duplicate').text(duplicateData.summary.duplicate);
+            }
+            
+            return true;
+        } catch (e) {
+            console.error('Error restoring duplicate check data:', e);
+            localStorage.removeItem('guest_post_duplicate_check_data');
+        }
+    }
+    return false;
+}
+
+// Xóa dữ liệu kiểm tra đạo văn
+function clearDuplicateCheckData() {
+    localStorage.removeItem('guest_post_duplicate_check_data');
+}
+
+// Khởi tạo logic lưu trữ dữ liệu khi load trang
+$(document).ready(function() {
+    // Khôi phục dữ liệu khi load trang
+    setTimeout(function() {
+        if (restoreDuplicateCheckData()) {
+            console.log('Đã khôi phục dữ liệu kiểm tra đạo văn');
+        }
+    }, 1000);
+    
+    // Lưu dữ liệu khi có thay đổi trong bảng kết quả
+    $(document).on('DOMSubtreeModified', '.duplicate-content-check .duplicate-content-table', function() {
+        // Chỉ lưu khi có dữ liệu thực sự
+        if ($('.duplicate-content-check .check-result[data-duplicate]').length > 0) {
+            saveDuplicateCheckData();
+        }
+    });
+    
+    // Lưu dữ liệu khi thay đổi nội dung
+    if (typeof tinyMCE !== 'undefined' && tinyMCE.activeEditor) {
+        tinyMCE.activeEditor.on('change', function() {
+            // Chỉ lưu khi có dữ liệu kiểm tra đạo văn
+            if ($('.duplicate-content-check .check-result[data-duplicate]').length > 0) {
+                saveDuplicateCheckData();
+            }
+        });
+    }
+    
+    // Xóa dữ liệu khi submit form thành công
+    $(document).on('Guest_Post_Article_Add', function() {
+        clearDuplicateCheckData();
+    });
+});
+
 function cassiopeia_guest_post_duplicate_content_check(data,currentObj,responseObject){
     let $progressbar = $(".duplicate-content-check .progress-bar-block progress");
     let $element = $("td[data-id='" + currentObj.id + "']");
@@ -1309,6 +1440,11 @@ function cassiopeia_guest_post_duplicate_content_check(data,currentObj,responseO
         $(".result").removeClass("isLoading");
         setTimeout(function () {
             $listOfID.attr("data-value","")
+                            // Lưu dữ liệu khi hoàn thành kiểm tra đạo văn
+                if (typeof saveDuplicateCheckData === 'function') {
+                    saveDuplicateCheckData();
+                    console.log('Đã lưu dữ liệu kiểm tra đạo văn sau khi hoàn thành toàn bộ');
+                }
             document.dispatchEvent(new CustomEvent("Guest_Post_Duplicate_Content_Check_Complete", {detail: noneDuplicate}))
         }, 1e3)
     }
@@ -1425,6 +1561,24 @@ function cassiopeia_recursion_duplicate_check(data, currentObj, responseObject =
                 } else {
                     element.attr("data-value", 0)
                 }
+                
+                // Dispatch event để thông báo có kết quả mới
+                document.dispatchEvent(new CustomEvent("GuestPostDuplicateContentCheck_Result", {
+                    detail: {
+                        id: currentObj.id,
+                        check: check,
+                        sources: sources
+                    }
+                }));
+                
+                // Lưu dữ liệu ngay khi có kết quả
+                if (typeof saveDuplicateCheckData === 'function') {
+                    setTimeout(function() {
+                        saveDuplicateCheckData();
+                        console.log('Đã lưu dữ liệu kiểm tra đạo văn sau khi có kết quả cho câu ID:', currentObj.id);
+                    }, 100);
+                }
+                
                 delete data[currentObj.index];
                 if (Object.keys(data).length > 0) {
                     currentObj = data[Object.keys(data)[0]];

@@ -15,13 +15,24 @@ try {
   $cache = !empty($_REQUEST['data']) ? $_REQUEST['data'] : [];
   $cache['project_id'] = $project_id;
   $project = node_load($project_id);
+  // Query để tính tổng số backlink nguồn
   $query = db_select("tbl_backlink", "tbl_backlink");
   $query->fields("tbl_backlink");
-  $query->join("tbl_backlink_detail", "tbl_backlink_detail", "tbl_backlink_detail.nid=tbl_backlink.id");
-  $query->addExpression("SUM(CASE WHEN tbl_backlink_detail.rel='dofollow' THEN 1 ELSE 0 END)", "total_dofollow");
-
+  $query->addExpression("COUNT(DISTINCT(tbl_backlink.id))", "totalBacklink");
   $query->addExpression("SUM(CASE WHEN tbl_backlink.indexed=1 THEN 1 ELSE 0 END)", "total_indexed");
-  $query->addExpression("COUNT(DISTINCT(tbl_backlink_detail.id))", "totalBacklink");
+  
+  // Query riêng để tính dofollow từ detail
+  $dofollow_query = db_select("tbl_backlink", "tbl_backlink");
+  $dofollow_query->join("tbl_backlink_detail", "tbl_backlink_detail", "tbl_backlink_detail.nid=tbl_backlink.id");
+  $dofollow_query->addExpression("SUM(CASE WHEN tbl_backlink_detail.rel='dofollow' THEN 1 ELSE 0 END)", "total_dofollow");
+  $dofollow_query->condition("tbl_backlink.pid", $project_id);
+  if (!empty($cache['from_date'])) {
+    $dofollow_query->condition("tbl_backlink.changed", strtotime(date("d-m-Y 00:00", strtotime($cache['from_date']))), ">=");
+  }
+  if (!empty($cache['to_date'])) {
+    $dofollow_query->condition("tbl_backlink.changed", strtotime(date("d-m-Y 23:59", strtotime($cache['to_date']))), "<=");
+  }
+  $dofollow_result = $dofollow_query->execute()->fetchObject();
 
   $query->condition("tbl_backlink.pid", $project_id);
   if (!empty($cache['from_date'])) {
@@ -109,7 +120,7 @@ $stt = 1;
           <li><a href="#" data-option="total-dofollow"
                  class="<?php if ($option == "total-dofollow") {
                    echo "active";
-                 } ?>">Do follow(<?php echo($result->total_dofollow) ?>)</a>
+                 } ?>">Do follow(<?php echo($dofollow_result->total_dofollow) ?>)</a>
           </li>
           <li><a href="#" data-option="total-indexed"
                  class="<?php if ($option == "total-indexed") {

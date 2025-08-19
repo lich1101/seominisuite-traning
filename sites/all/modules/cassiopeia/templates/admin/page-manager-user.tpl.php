@@ -112,6 +112,7 @@ if($user->uid==1){
                 <th>Dự án Outline Content</th>
                 <th>Ngày tạo</th>
                 <th>Thời hạn</th>
+                <th>Trạng thái</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
@@ -180,6 +181,13 @@ if($user->uid==1){
                         ?>
                     </td>
                     <td>
+                        <?php if (cassiopeia_is_user_locked_by_flood($_account->uid)): ?>
+                            <span class="label label-danger">Bị khóa</span>
+                        <?php else: ?>
+                            <span class="label label-success">Bình thường</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
                         <?php
                         $menu_item = menu_get_item('user/'.$_account->uid.'/change-packet');
                         if(!empty($menu_item) && !empty($menu_item['access'])):?>
@@ -196,6 +204,9 @@ if($user->uid==1){
                         <a title="Thay đổi điểm người dùng" class="btn btn-warning" href="/admin/manager/guest-post/point/<?php echo $_account->uid; ?>/edit?destination=admin/manager/user"><i class="fa-brands fa-wordpress-simple"></i></a>
                         <a title="Thay đổi lượt đổi domain" class="btn btn-info" href="/admin/manager/guest-post/domain-change/<?php echo $_account->uid; ?>/edit?destination=admin/manager/user"><i class="fa-solid fa-sliders"></i></a>
                         <a title="Thay đổi lượt giải captcha" class="btn btn-purple" href="/admin/manager/captcha/resolve/<?php echo $_account->uid; ?>/edit?destination=admin/manager/user"><i class="fa-solid fa-sliders"></i></a>
+                        <?php if (cassiopeia_is_user_locked_by_flood($_account->uid)): ?>
+                            <button type="button" class="btn btn-orange unlock-user-btn" title="Mở khóa tài khoản (bị khóa do đăng nhập sai)" data-uid="<?php echo $_account->uid; ?>" data-username="<?php echo $_account->full_name; ?>"><i class="fa fa-unlock"></i></button>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php $stt--; endforeach; ?>
@@ -211,3 +222,70 @@ if($user->uid==1){
     </div>
     <!--e: paging-->
 </div>
+
+<style>
+.btn-orange {
+    background-color: #ff8c00;
+    border-color: #ff8c00;
+    color: white;
+}
+.btn-orange:hover {
+    background-color: #e67e00;
+    border-color: #e67e00;
+    color: white;
+}
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+.label-success {
+    background-color: #5cb85c;
+}
+.label-danger {
+    background-color: #d9534f;
+}
+</style>
+
+<script>
+jQuery(document).ready(function($) {
+    $('.unlock-user-btn').on('click', function() {
+        var uid = $(this).data('uid');
+        var username = $(this).data('username');
+        var $btn = $(this);
+        
+        if (confirm('Bạn có chắc chắn muốn mở khóa tài khoản "' + username + '" không?')) {
+            $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+            
+            $.ajax({
+                url: '/cassiopeia/ajax/unlock-user',
+                type: 'POST',
+                data: {
+                    uid: uid
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        alert('Đã mở khóa tài khoản "' + username + '" thành công!');
+                        $btn.removeClass('btn-orange').addClass('btn-success').html('<i class="fa fa-check"></i>').prop('disabled', true);
+                    } else {
+                        alert('Có lỗi xảy ra: ' + response.message);
+                        $btn.prop('disabled', false).html('<i class="fa fa-unlock"></i>');
+                    }
+                },
+                error: function() {
+                    alert('Có lỗi xảy ra khi kết nối server!');
+                    $btn.prop('disabled', false).html('<i class="fa fa-unlock"></i>');
+                }
+            });
+        }
+    });
+});
+</script>

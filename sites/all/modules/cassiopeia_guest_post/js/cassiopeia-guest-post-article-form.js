@@ -228,6 +228,243 @@ if (typeof (window.cassiopeia_tagifies) == 'undefined') {
                     },"<h3 class='margin-0'>Mời bạn chỉnh sửa lại bài viết</h3>");
                     $(".loading-block").remove();
                 }
+                
+                // Lưu trữ dữ liệu kiểm tra đạo văn
+                function saveDuplicateCheckData() {
+                    console.log('Bắt đầu lưu dữ liệu kiểm tra đạo văn...');
+                    let duplicateData = {
+                        timestamp: new Date().getTime(),
+                        results: {}
+                    };
+                    
+                    // Lưu kết quả từng câu
+                    $('.duplicate-content-check .duplicate-content-table tbody tr').each(function() {
+                        let $row = $(this);
+                        let id = $row.find('td[data-id]').attr('data-id');
+                        if (id) {
+                            let query = $row.find('td[data-id]').text().trim();
+                            let sources = $row.find('.sources').html();
+                            let result = $row.find('.check-result').attr('data-duplicate');
+                            let resultValue = $row.find('.check-result').attr('data-value');
+                            
+                            duplicateData.results[id] = {
+                                query: query,
+                                sources: sources,
+                                result: result,
+                                resultValue: resultValue
+                            };
+                        }
+                    });
+                    
+                    // Lưu tổng kết
+                    let noneDuplicate = $('.total-result span.none-duplicate').text();
+                    let duplicate = $('.total-result span.duplicate').text();
+                    duplicateData.summary = {
+                        noneDuplicate: noneDuplicate,
+                        duplicate: duplicate
+                    };
+                    
+                    // Lưu vào localStorage
+                    localStorage.setItem('guest_post_duplicate_check_data', JSON.stringify(duplicateData));
+                    console.log('Đã lưu dữ liệu kiểm tra đạo văn:', duplicateData);
+                }
+                
+                // Khôi phục dữ liệu kiểm tra đạo văn
+                function restoreDuplicateCheckData() {
+                    console.log('Bắt đầu khôi phục dữ liệu kiểm tra đạo văn...');
+                    let savedData = localStorage.getItem('guest_post_duplicate_check_data');
+                    if (savedData) {
+                        try {
+                            let duplicateData = JSON.parse(savedData);
+                            
+                            // Kiểm tra xem dữ liệu có còn hợp lệ không (trong vòng 1 giờ)
+                            let now = new Date().getTime();
+                            if (now - duplicateData.timestamp > 3600000) { // 1 giờ
+                                localStorage.removeItem('guest_post_duplicate_check_data');
+                                return false;
+                            }
+                            
+                            // KHÔNG khôi phục nội dung TinyMCE để tránh bị chèn nội dung bài trước đó
+                            
+                            // Khôi phục kết quả
+                            if (duplicateData.results) {
+                                console.log('Bắt đầu khôi phục kết quả cho', Object.keys(duplicateData.results).length, 'câu');
+                                Object.keys(duplicateData.results).forEach(function(id) {
+                                    let result = duplicateData.results[id];
+                                    let $row = $('.duplicate-content-check .duplicate-content-table tbody tr').find('td[data-id="' + id + '"]').closest('tr');
+                                    if ($row.length) {
+                                        $row.find('.sources').html(result.sources);
+                                        $row.find('.check-result').attr('data-duplicate', result.result);
+                                        $row.find('.check-result').attr('data-value', result.resultValue);
+                                        
+                                        // Khôi phục icon
+                                        if (result.result === 'true') {
+                                            $row.find('.check-result').html('<i class="fa fa-times"></i>');
+                                        } else {
+                                            $row.find('.check-result').html('<i class="fa fa-check"></i>');
+                                        }
+                                        console.log('Đã khôi phục kết quả cho câu ID:', id);
+                                    } else {
+                                        console.log('Không tìm thấy row cho câu ID:', id);
+                                    }
+                                });
+                            }
+                            
+                            // Khôi phục tổng kết
+                            if (duplicateData.summary) {
+                                $('.total-result span.none-duplicate').text(duplicateData.summary.noneDuplicate);
+                                $('.total-result span.duplicate').text(duplicateData.summary.duplicate);
+                                console.log('Đã khôi phục tổng kết:', duplicateData.summary);
+                            }
+                            
+                            return true;
+                        } catch (e) {
+                            console.error('Error restoring duplicate check data:', e);
+                            localStorage.removeItem('guest_post_duplicate_check_data');
+                        }
+                    }
+                    return false;
+                }
+                
+                // Xóa dữ liệu kiểm tra đạo văn
+                function clearDuplicateCheckData() {
+                    localStorage.removeItem('guest_post_duplicate_check_data');
+                    console.log('Đã xóa dữ liệu kiểm tra đạo văn');
+                }
+                
+                // Test function để kiểm tra dữ liệu
+                function testDuplicateCheckData() {
+                    let savedData = localStorage.getItem('guest_post_duplicate_check_data');
+                    if (savedData) {
+                        console.log('Dữ liệu hiện tại:', JSON.parse(savedData));
+                    } else {
+                        console.log('Không có dữ liệu');
+                    }
+                }
+                
+                // Thêm event listener để lưu dữ liệu khi có thay đổi
+                $(document).ready(function() {
+                    // Đợi TinyMCE khởi tạo xong rồi mới khôi phục dữ liệu
+                    function waitForTinyMCE() {
+                        if (typeof tinyMCE !== 'undefined' && tinyMCE.activeEditor) {
+                            // Khôi phục dữ liệu khi TinyMCE đã sẵn sàng
+                            setTimeout(function() {
+                                if (restoreDuplicateCheckData()) {
+                                    console.log('Đã khôi phục dữ liệu kiểm tra đạo văn');
+                                }
+                            }, 500);
+                        } else {
+                            // Thử lại sau 100ms nếu TinyMCE chưa sẵn sàng
+                            setTimeout(waitForTinyMCE, 100);
+                        }
+                    }
+                    
+                    // Đợi bảng kết quả được tạo xong
+                    function waitForResultTable() {
+                        if ($('.duplicate-content-check .duplicate-content-table tbody tr').length > 0) {
+                            // Bảng đã có dữ liệu, khôi phục ngay
+                            if (restoreDuplicateCheckData()) {
+                                console.log('Đã khôi phục dữ liệu kiểm tra đạo văn sau khi bảng sẵn sàng');
+                            }
+                        } else {
+                            // Thử lại sau 200ms nếu bảng chưa sẵn sàng
+                            setTimeout(waitForResultTable, 200);
+                        }
+                    }
+                    
+                    // Bắt đầu đợi TinyMCE và bảng kết quả
+                    waitForTinyMCE();
+                    waitForResultTable();
+                    
+                    // Kiểm tra xem có dữ liệu đã lưu không
+                    let savedData = localStorage.getItem('guest_post_duplicate_check_data');
+                    if (savedData) {
+                        console.log('Phát hiện dữ liệu kiểm tra đạo văn đã lưu:', JSON.parse(savedData));
+                    } else {
+                        console.log('Không có dữ liệu kiểm tra đạo văn đã lưu');
+                    }
+                    
+                    // Thêm function test vào window để có thể gọi từ console
+                    window.testDuplicateCheckData = testDuplicateCheckData;
+                    window.saveDuplicateCheckData = saveDuplicateCheckData;
+                    window.restoreDuplicateCheckData = restoreDuplicateCheckData;
+                    window.clearDuplicateCheckData = clearDuplicateCheckData;
+                    window.waitForResultTable = waitForResultTable;
+                    console.log('Đã thêm các function test vào window. Gọi testDuplicateCheckData() để kiểm tra dữ liệu.');
+                    console.log('Gọi waitForResultTable() để đợi bảng kết quả và khôi phục dữ liệu.');
+                    
+                    // Lưu dữ liệu khi có thay đổi trong bảng kết quả
+                    $(document).on('DOMSubtreeModified', '.duplicate-content-check .duplicate-content-table', function() {
+                        // Chỉ lưu khi có dữ liệu thực sự
+                        if ($('.duplicate-content-check .duplicate-content-table .check-result[data-duplicate]').length > 0) {
+                            setTimeout(function() {
+                                saveDuplicateCheckData();
+                            }, 100);
+                        }
+                    });
+                    
+                    // Lưu dữ liệu khi thay đổi nội dung
+                    $(document).on('TinyMCE_Ready', function() {
+                        if (typeof tinyMCE !== 'undefined' && tinyMCE.activeEditor) {
+                            tinyMCE.activeEditor.on('change', function() {
+                                // Chỉ lưu khi có dữ liệu kiểm tra đạo văn
+                                if ($('.duplicate-content-check .duplicate-content-table .check-result[data-duplicate]').length > 0) {
+                                    saveDuplicateCheckData();
+                                }
+                            });
+                        }
+                    });
+                    
+                    // Xóa dữ liệu khi submit form thành công
+                    $(document).on('Guest_Post_Article_Add', function() {
+                        clearDuplicateCheckData();
+                    });
+                    
+                    // Lưu dữ liệu khi hoàn thành kiểm tra đạo văn
+                    $(document).on('Guest_Post_Duplicate_Content_Check_Complete', function(e) {
+                        setTimeout(function() {
+                            saveDuplicateCheckData();
+                            console.log('Đã lưu dữ liệu kiểm tra đạo văn sau khi hoàn thành');
+                        }, 1000);
+                    });
+                    
+                    // Lưu dữ liệu khi có kết quả từng câu
+                    $(document).on('click', '.check-result', function() {
+                        setTimeout(function() {
+                            saveDuplicateCheckData();
+                            console.log('Đã lưu dữ liệu kiểm tra đạo văn sau khi có kết quả từng câu');
+                        }, 100);
+                    });
+                    
+                    // Lưu dữ liệu khi có thay đổi trong kết quả kiểm tra
+                    $(document).on('DOMSubtreeModified', '.check-result', function() {
+                        setTimeout(function() {
+                            if ($(this).attr('data-duplicate') !== undefined) {
+                                saveDuplicateCheckData();
+                                console.log('Đã lưu dữ liệu kiểm tra đạo văn sau khi có kết quả mới');
+                            }
+                        }, 100);
+                    });
+                    
+                    // Lưu dữ liệu khi có thay đổi trong sources
+                    $(document).on('DOMSubtreeModified', '.sources', function() {
+                        setTimeout(function() {
+                            if ($(this).html().trim() !== '') {
+                                saveDuplicateCheckData();
+                                console.log('Đã lưu dữ liệu kiểm tra đạo văn sau khi có sources mới');
+                            }
+                        }, 100);
+                    });
+                    
+                    // Lưu dữ liệu khi có kết quả từ extension
+                    $(document).on('GuestPostDuplicateContentCheck_Result', function(e) {
+                        setTimeout(function() {
+                            saveDuplicateCheckData();
+                            console.log('Đã lưu dữ liệu kiểm tra đạo văn sau khi có kết quả từ extension');
+                        }, 200);
+                    });
+                });
+                
                 $.fn.guestPostDuplicateContentCheck = function (data) {
                     if ($("#footer").hasClass("seoToolExtension") !== true) {
                         installExtension();

@@ -2708,3 +2708,78 @@ function cassiopeia_get_url_debug_callback() {
 
     return $output;
 }
+
+/**
+ * Mở khóa tài khoản bị khóa do đăng nhập sai quá 5 lần
+ */
+function cassiopeia_unlock_user_account($uid) {
+    global $user;
+    
+    // Kiểm tra quyền admin
+    if (!user_access('cassiopeia module')) {
+        drupal_set_message(t('Bạn không có quyền thực hiện hành động này.'), 'error');
+        return FALSE;
+    }
+    
+    // Lấy thông tin user
+    $account = user_load($uid);
+    if (!$account) {
+        drupal_set_message(t('Không tìm thấy tài khoản.'), 'error');
+        return FALSE;
+    }
+    
+    // Xóa flood control events cho user này
+    $identifier = $account->uid . '-' . ip_address();
+    flood_clear_event('failed_login_attempt_user', $identifier);
+    
+    // Cũng xóa theo uid nếu có
+    flood_clear_event('failed_login_attempt_user', $account->uid);
+    
+    // Log hành động
+    watchdog('user', 'Admin %admin unlocked account %user from flood control.', array(
+        '%admin' => $user->name,
+        '%user' => $account->name
+    ), WATCHDOG_NOTICE);
+    
+    drupal_set_message(t('Đã mở khóa tài khoản %name thành công.', array('%name' => $account->name)), 'status');
+    return TRUE;
+}
+
+/**
+ * Kiểm tra xem tài khoản có bị khóa do flood control hay không
+ */
+function cassiopeia_is_user_locked_by_flood($uid) {
+    $account = user_load($uid);
+    if (!$account) {
+        return FALSE;
+    }
+    
+    // Kiểm tra flood control cho user
+    $identifier = $account->uid . '-' . ip_address();
+    $is_locked_by_uid_ip = !flood_is_allowed('failed_login_attempt_user', variable_get('user_failed_login_user_limit', 5), variable_get('user_failed_login_user_window', 21600), $identifier);
+    
+    // Kiểm tra flood control chỉ theo uid
+    $is_locked_by_uid = !flood_is_allowed('failed_login_attempt_user', variable_get('user_failed_login_user_limit', 5), variable_get('user_failed_login_user_window', 21600), $account->uid);
+    
+    return $is_locked_by_uid_ip || $is_locked_by_uid;
+}
+
+/**
+ * AJAX callback để mở khóa tài khoản
+ */
+function cassiopeia_ajax_unlock_user() {
+    $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
+    
+    if ($uid > 0) {
+        $result = cassiopeia_unlock_user_account($uid);
+        drupal_json_output(array(
+            'success' => $result,
+            'message' => $result ? 'Mở khóa thành công' : 'Có lỗi xảy ra'
+        ));
+    } else {
+        drupal_json_output(array(
+            'success' => FALSE,
+            'message' => 'UID không hợp lệ'
+        ));
+    }
+}

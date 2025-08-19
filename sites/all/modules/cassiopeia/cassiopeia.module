@@ -395,6 +395,15 @@ function cassiopeia_menu() {
         'access callback' => 'cassiopeia_user_accept',
         'file'              => 'cassiopeia.inc',
     );
+    
+    $items['cassiopeia/ajax/unlock-user'] = array(
+        'type'              => MENU_CALLBACK,
+        'page callback'     => 'cassiopeia_ajax_unlock_user',
+        'delivery callback' => 'drupal_json_output',
+        'access callback' => 'cassiopeia_user_manager_accept',
+        'file'              => 'cassiopeia.inc',
+    );
+    
  $items['test/ajax'] = array(
         'type'              => MENU_CALLBACK,
         'page callback'     => 'cassiopeia_test_ajax_page',
@@ -409,7 +418,7 @@ function cassiopeia_menu() {
         'access arguments' => array('cassiopeia module'),
         'file'              => 'cassiopeia.inc',
     );
-
+    
   return $items;
 }
 function content_article_load($id){

@@ -2046,7 +2046,46 @@ function cassiopeia_guest_post_article_form_save_ajax_submit($form,&$form_state)
             exit;
         }else{
             cassiopeia_guest_post_article_delete($form_state['#article']->id);
-            $commands[] = ajax_command_invoke("","guestPostAlert",array(json_encode(array(0=>" Đăng bài chưa thành công. Mời bạn đăng lại bài viết!"))));
+                        
+            // Tạo thông báo lỗi chi tiết
+            $error_message = "Đăng bài chưa thành công. ";
+            
+            if (isset($wp_post->error)) {
+                $error_message .= $wp_post->error;
+                
+                // Thêm gợi ý khắc phục dựa trên loại lỗi
+                if (isset($wp_post->type)) {
+                    switch ($wp_post->type) {
+                        case 'curl_error':
+                            $error_message .= "\n\nGợi ý: Kiểm tra kết nối mạng hoặc thử lại sau.";
+                            break;
+                        case 'http_error':
+                            if (isset($wp_post->code) && $wp_post->code == 404) {
+                                $error_message .= "\n\nGợi ý: Website có thể đã thay đổi cấu trúc hoặc không hỗ trợ đăng bài.";
+                            } elseif (isset($wp_post->code) && $wp_post->code == 403) {
+                                $error_message .= "\n\nGợi ý: Cookie/authentication không hợp lệ. Vui lòng liên hệ admin.";
+                            } elseif (isset($wp_post->code) && $wp_post->code == 500) {
+                                $error_message .= "\n\nGợi ý: Website đang gặp sự cố. Thử lại sau.";
+                            }
+                            break;
+                        case 'empty_response':
+                            $error_message .= "\n\nGợi ý: Website không phản hồi. Thử lại sau hoặc chọn website khác.";
+                            break;
+                        case 'json_error':
+                            $error_message .= "\n\nGợi ý: Dữ liệu từ website không đúng định dạng.";
+                            break;
+                        case 'wordpress_error':
+                            $error_message .= "\n\nGợi ý: Lỗi từ hệ thống WordPress của website đích.";
+                            break;
+                    }
+                }
+            } else {
+                $error_message .= "Không nhận được phản hồi từ website đích.";
+            }
+            
+            $error_message .= "\n\nWebsite: " . $form_state['#article']->website_domain;
+            
+            $commands[] = ajax_command_invoke("","guestPostAlert",array(json_encode(array(0=>$error_message))));
         }
 //        $commands[] = ajax_command_invoke("","guestPostArticleAdd",array(json_encode($form_state['#article'])));
         return array(
