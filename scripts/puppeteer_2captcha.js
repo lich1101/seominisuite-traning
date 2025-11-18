@@ -1,11 +1,12 @@
 // puppeteer_2captcha.js
 // Usage: node puppeteer_2captcha.js '{"url":"...","sitekey":"...","data_s":"..."}'
 
+require('dotenv').config();
 const puppeteer = require('puppeteer');
 const fetch = require('node-fetch');
 
 async function solveRecaptcha({ url, sitekey, data_s }) {
-  const API_KEY = process.env.TWOCAPTCHA_API_KEY || 'ac51483e4f0908132f9ad0482722627b'; // Thay YOUR_2CAPTCHA_API_KEY bằng API key thật của bạn
+  const API_KEY = process.env.TWOCAPTCHA_API_KEY; 
   // 1. Request 2Captcha to solve
   let reqBody = {
     method: 'POST',

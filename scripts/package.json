@@ -7,10 +7,16 @@
     "start": "node puppeteer_2captcha.js"
   },
   "dependencies": {
-    "puppeteer": "^21.0.0",
-    "node-fetch": "^2.6.7"
+    "dotenv": "^17.2.3",
+    "node-fetch": "^2.7.0",
+    "puppeteer": "^24.25.0"
   },
-  "keywords": ["puppeteer", "2captcha", "recaptcha", "automation"],
+  "keywords": [
+    "puppeteer",
+    "2captcha",
+    "recaptcha",
+    "automation"
+  ],
   "author": "Seominisuite",
   "license": "MIT"
 }

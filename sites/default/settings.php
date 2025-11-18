@@ -266,11 +266,11 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'admin_db',
-      'username' => 'admin_user',
-      'password' => '0X5QKBNjR8',
-      'host' => '192.168.1.197',
-      'port' => '3306',
+      'database' => 'seominisuite',
+      'username' => 'root',
+      'password' => 'root',
+      'host' => 'localhost',
+      'port' => '8889',
       'driver' => 'mysql',
       'prefix' => '',
     ), 
