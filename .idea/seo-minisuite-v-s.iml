@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/misc/brumann/polyfill-unserialize/src" isTestSource="false" packagePrefix="Brumann\Polyfill\" />
+      <sourceFolder url="file://$MODULE_DIR$/misc/brumann/polyfill-unserialize/tests" isTestSource="true" packagePrefix="Tests\Brumann\Polyfill\" />
+      <sourceFolder url="file://$MODULE_DIR$/misc/typo3/phar-stream-wrapper/src" isTestSource="false" packagePrefix="TYPO3\PharStreamWrapper\" />
+      <sourceFolder url="file://$MODULE_DIR$/misc/typo3/phar-stream-wrapper/tests" isTestSource="true" packagePrefix="TYPO3\PharStreamWrapper\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/modules/simpletest/lib" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/modules/simpletest/tests/psr_0_test/lib" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/libraries" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/libraries/PHPExcel/Classes" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/libraries/hybridauth/hybridauth" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/cassiopeia-captcha/2captcha-php-master/2captcha-php-master/src" isTestSource="false" packagePrefix="TwoCaptcha\" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/cassiopeia-captcha/2captcha-php-master/2captcha-php-master/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/cassiopeia-captcha/2captcha-php-master/2captcha-php-master/tests" isTestSource="true" packagePrefix="TwoCaptcha\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/cassiopeia-captcha/2captcha-php-master/src" isTestSource="false" packagePrefix="TwoCaptcha\" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/cassiopeia-captcha/2captcha-php-master/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/cassiopeia-captcha/2captcha-php-master/tests" isTestSource="true" packagePrefix="TwoCaptcha\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/contrib/advagg/advagg_js_compress" isTestSource="false" packagePrefix="Patchwork" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/contrib/recaptcha/recaptcha-php/src/ReCaptcha" isTestSource="false" packagePrefix="ReCaptcha\" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/contrib/recaptcha/recaptcha-php/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/sites/all/modules/contrib/recaptcha/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/chi-teck/drupal-code-generator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/annotated-command" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/config" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/filter-via-dot-access-data" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/log" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/output-formatters" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/robo" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/self-update" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/site-alias" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/consolidation/site-process" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/dflydev/dot-access-data" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/drush/drush" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/enlightn/security-checker" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/grasmash/expander" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/grasmash/yaml-expander" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/guzzle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/promises" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/psr7" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/league/container" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nikic/php-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-factory" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-message" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psy/psysh" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/event-dispatcher-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/finder" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php73" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/process" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/var-dumper" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/yaml" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/twig/twig" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webflo/drupal-finder" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/webmozart/path-util" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

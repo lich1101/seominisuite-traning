@@ -1,0 +1,36 @@
+<?php
+
+
+function cassiopeia_update_1() {
+  $transaction = db_transaction();
+  try {
+    
+    if (!db_table_exists('cassiopeia_content')) {
+      watchdog('cassiopeia', 'Bảng cassiopeia_content chưa tồn tại. Vui lòng tạo bảng trước.', array(), WATCHDOG_ERROR);
+      return array('success' => FALSE);
+    }
+    
+    
+    if (!db_field_exists('cassiopeia_content', 'test')) {
+      
+      $field = array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'Test field',
+      );
+      
+      
+      db_add_field('cassiopeia_content', 'test', $field);
+      
+      drupal_set_message('Đã thêm field test vào bảng cassiopeia_content');
+    }
+    
+    return array('success' => TRUE);
+  }
+  catch (Exception $e) {
+    
+    watchdog('cassiopeia', 'Lỗi khi update: @message', array('@message' => $e->getMessage()), WATCHDOG_ERROR);
+    $transaction->rollback();
+    return array('success' => FALSE);
+  }
+}
